@@ -58,6 +58,14 @@ const projects = [
   },
 ];
 
+const navLinks = [
+  { label: "Home", href: "#home" },
+  { label: "About", href: "#about" },
+  { label: "Projects", href: "#projects" },
+  { label: "Gallery", href: "#gallery" },
+  { label: "Contact", href: "#contact" },
+];
+
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function Home() {
@@ -84,29 +92,26 @@ export default function Home() {
       </div>
 
       {/* ── NAVBAR ── */}
-      <header className="fixed top-0 inset-x-0 z-50 flex justify-center pt-4">
-        <nav className="glass-nav rounded-full px-6 py-2 flex items-center gap-8">
-          <span
-            className="text-lg font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent cursor-pointer"
-            onClick={() => document.querySelector("#home")?.scrollIntoView({ behavior: "smooth" })}
-          >
-            Ega.dev
-          </span>
-          {[
-            { label: "Home",     href: "#home"     },
-            { label: "About",    href: "#about"    },
-            { label: "Projects", href: "#projects" },
-            { label: "Gallery",  href: "#gallery"  },
-            { label: "Contact",  href: "#contact"  },
-          ].map((l) => (
-            <button
-              key={l.href}
-              onClick={() => document.querySelector(l.href)?.scrollIntoView({ behavior: "smooth" })}
-              className="text-sm text-white/60 hover:text-white transition-colors hidden md:block"
+      <header className="fixed top-0 inset-x-0 z-50 flex justify-center px-2 pt-3">
+        <nav className="glass-nav w-full max-w-5xl rounded-full px-3 py-2 md:px-6">
+          <div className="no-scrollbar flex items-center gap-2 overflow-x-auto md:gap-6">
+            <span
+              className="shrink-0 text-lg font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent cursor-pointer"
+              onClick={() => document.querySelector("#home")?.scrollIntoView({ behavior: "smooth" })}
             >
-              {l.label}
-            </button>
-          ))}
+              Ega.dev
+            </span>
+
+            {navLinks.map((l) => (
+              <button
+                key={l.href}
+                onClick={() => document.querySelector(l.href)?.scrollIntoView({ behavior: "smooth" })}
+                className="shrink-0 rounded-full border border-white/15 px-3 py-1 text-xs md:text-sm text-white/80 hover:border-violet-400/60 hover:text-white transition-colors"
+              >
+                {l.label}
+              </button>
+            ))}
+          </div>
         </nav>
       </header>
 
