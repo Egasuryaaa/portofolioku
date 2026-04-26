@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import './LiquidEther.css';
@@ -15,7 +13,7 @@ export default function LiquidEther({
   BFECC = true,
   resolution = 0.5,
   isBounce = false,
-  colors = ['#5227FF', '#b37bb1', '#B497CF'],
+  colors = ['#5227FF', '#FF9FFC', '#B497CF'],
   style = {},
   className = '',
   autoDemo = true,
