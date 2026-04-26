@@ -1,10 +1,10 @@
 export default function Footer() {
   return (
-    <footer className="section-shell border-t border-white/10 py-8">
-      <div className="mx-auto max-w-6xl px-4 text-center text-sm text-slate-300 md:px-8">
-        <p>Built with ❤️ by Ega Surya Saputra</p>
-        <p className="mt-1">Copyright {new Date().getFullYear()} Ega Surya Saputra</p>
-      </div>
+    <footer className="relative z-10 py-8 text-center border-t border-white/10">
+      <p className="text-white/30 text-sm">
+        Built with ❤️ by <span className="text-violet-400 font-medium">Ega Surya Saputra</span> · ©{" "}
+        {new Date().getFullYear()}
+      </p>
     </footer>
   );
 }

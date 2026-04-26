@@ -1,60 +1,119 @@
-import Lanyard from "@/components/Lanyard";
-import RotatingText from "@/components/RotatingText";
-import ScrollReveal from "@/components/ScrollReveal";
+"use client";
 
-const rotatingRoles = [
-  "Frontend Developer",
-  "Backend Developer",
-  "Mobile Developer",
-  "Laravel Enthusiast",
-  "Node.js Developer",
-];
+import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
+import RotatingText from "./RotatingText";
+
+const Lanyard = dynamic(() => import("./Lanyard"), { ssr: false });
+
+const Reveal = ({
+  children,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 40 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay }}
+  >
+    {children}
+  </motion.div>
+);
 
 export default function HeroSection() {
   return (
-    <section id="home" className="section-shell scroll-mt-28 pt-28">
-      <div className="mx-auto grid min-h-[calc(100vh-7rem)] max-w-6xl items-center gap-12 px-4 py-10 md:grid-cols-2 md:px-8">
-        <ScrollReveal direction="up">
-          <p className="text-sm uppercase tracking-[0.25em] text-cyan-200">Hi, I&apos;m</p>
-          <h1 className="font-heading mt-4 text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">
-            Ega Surya Saputra
-          </h1>
+    <section
+      id="home"
+      className="section-shell min-h-screen flex items-center pt-20 px-6 md:px-16 max-w-6xl mx-auto"
+    >
+      <div className="grid md:grid-cols-2 gap-12 items-center w-full">
+        <div>
+          <Reveal delay={0.1}>
+            <p className="text-white/50 text-lg mb-2">Hi, I&apos;m</p>
+          </Reveal>
 
-          <div className="mt-4 text-xl font-semibold text-violet-300 sm:text-2xl">
-            <RotatingText
-              texts={rotatingRoles}
-              rotationInterval={2500}
-              mainClassName="font-heading bg-gradient-to-r from-violet-300 via-cyan-200 to-white bg-clip-text text-transparent"
-            />
-          </div>
+          <Reveal delay={0.2}>
+            <h1 className="font-heading text-5xl md:text-6xl font-bold text-white mb-4 leading-tight">
+              Ega Surya
+              <br />
+              Saputra
+            </h1>
+          </Reveal>
 
-          <p className="mt-6 max-w-xl text-sm leading-relaxed text-slate-200 sm:text-base">
-            Motivated D3 Informatics Engineering student with hands-on experience building RESTful
-            APIs, web applications, and mobile apps using Laravel, Node.js, and Flutter. Based in
-            Mojokerto, East Java.
-          </p>
+          <Reveal delay={0.3}>
+            <div className="flex items-center gap-3 mb-6 text-xl font-semibold">
+              <span className="text-white/40">I&apos;m a</span>
+              <RotatingText
+                texts={[
+                  "Frontend Developer",
+                  "Backend Developer",
+                  "Mobile Developer",
+                  "Laravel Enthusiast",
+                  "Node.js Developer",
+                ]}
+                mainClassName="text-violet-400"
+                staggerFrom="last"
+                staggerDuration={0.025}
+                splitLevelClassName="overflow-hidden pb-0.5"
+                transition={{ type: "spring", damping: 30, stiffness: 400 }}
+                rotationInterval={2500}
+              />
+            </div>
+          </Reveal>
 
-          <div className="mt-8 flex flex-wrap gap-4">
-            <a
-              href="/cv-egasurya-saputra.pdf"
-              className="rounded-full bg-gradient-to-r from-violet-500 to-cyan-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-cyan-500/25 transition hover:scale-[1.02]"
-              download
-            >
-              Download CV
-            </a>
-            <a
-              href="#contact"
-              className="rounded-full border border-white/30 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-100 backdrop-blur transition hover:border-cyan-300 hover:text-white"
-            >
-              Contact Me
-            </a>
-          </div>
-        </ScrollReveal>
+          <Reveal delay={0.4}>
+            <p className="text-white/60 leading-relaxed mb-8 max-w-lg">
+              Motivated D3 Informatics Engineering student with hands-on experience building
+              RESTful APIs, web applications, and mobile apps using Laravel, Node.js, and Flutter.
+              Based in Mojokerto, East Java.
+            </p>
+          </Reveal>
 
-        <ScrollReveal direction="up" delay={0.15} className="flex justify-center md:justify-end">
-          {/* Replace with your real Discord User ID after enabling Developer Mode in Discord. */}
-          <Lanyard id="YOUR_DISCORD_USER_ID_HERE" />
-        </ScrollReveal>
+          <Reveal delay={0.5}>
+            <div className="flex flex-wrap gap-4">
+              <a
+                href="/cv.pdf"
+                download
+                className="px-6 py-3 rounded-xl font-semibold text-white transition-all hover:scale-105"
+                style={{
+                  background: "linear-gradient(135deg, #7c3aed, #06b6d4)",
+                  boxShadow: "0 0 20px rgba(124,58,237,0.4)",
+                }}
+              >
+                Download CV
+              </a>
+              <button
+                onClick={() =>
+                  document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" })
+                }
+                className="px-6 py-3 rounded-xl font-semibold text-white/80 border border-white/20 hover:border-violet-400 hover:text-white transition-all hover:scale-105"
+                style={{
+                  backdropFilter: "blur(8px)",
+                  background: "rgba(255,255,255,0.05)",
+                }}
+              >
+                Contact Me
+              </button>
+            </div>
+          </Reveal>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.65, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          className="flex justify-center md:justify-end"
+          style={{ height: "500px" }}
+        >
+          <Lanyard
+            position={[0, 0, 20]}
+            gravity={[0, -40, 0]}
+            fov={20}
+            transparent={true}
+          />
+        </motion.div>
       </div>
     </section>
   );

@@ -1,85 +1,63 @@
 "use client";
 
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 import Masonry from "react-masonry-css";
-import ScrollReveal from "@/components/ScrollReveal";
-
-// ============================================================
-// Gallery image docs:
-// 1. Put images in /public/gallery/
-// 2. Use names gallery-1.jpg ... gallery-6.jpg
-// 3. Supported formats: .jpg .jpeg .png .webp
-// 4. Recommended min size: 800x600px
-// ============================================================
 
 const galleryData = [
-  {
-    src: "/gallery/gallery-1.jpg",
-    fallback: "https://picsum.photos/seed/ega-gallery-1/1200/900",
-    caption: "Network Complaint System - UI",
-  },
-  {
-    src: "/gallery/gallery-2.jpg",
-    fallback: "https://picsum.photos/seed/ega-gallery-2/900/1200",
-    caption: "Daily Worker Finder - Mobile",
-  },
-  {
-    src: "/gallery/gallery-3.jpg",
-    fallback: "https://picsum.photos/seed/ega-gallery-3/1200/1100",
-    caption: "IwakRejosari - Booking Flow",
-  },
-  {
-    src: "/gallery/gallery-4.jpg",
-    fallback: "https://picsum.photos/seed/ega-gallery-4/1000/1300",
-    caption: "Backend API - Dashboard",
-  },
-  {
-    src: "/gallery/gallery-5.jpg",
-    fallback: "https://picsum.photos/seed/ega-gallery-5/1100/900",
-    caption: "Project Documentation",
-  },
-  {
-    src: "/gallery/gallery-6.jpg",
-    fallback: "https://picsum.photos/seed/ega-gallery-6/900/1100",
-    caption: "Development Workspace",
-  },
+  { src: "https://picsum.photos/seed/ega1/600/800", caption: "Network Complaint System" },
+  { src: "https://picsum.photos/seed/ega2/600/400", caption: "Daily Worker Finder" },
+  { src: "https://picsum.photos/seed/ega3/600/700", caption: "IwakRejosari App" },
+  { src: "https://picsum.photos/seed/ega4/600/500", caption: "Internship - Kominfo" },
+  { src: "https://picsum.photos/seed/ega5/600/600", caption: "UI/UX Design Work" },
+  { src: "https://picsum.photos/seed/ega6/600/450", caption: "Backend Development" },
 ];
 
 const breakpoints = { default: 3, 1024: 2, 640: 1 };
 
 export default function GallerySection() {
   return (
-    <section id="gallery" className="section-shell scroll-mt-28 py-14">
-      <div className="mx-auto max-w-6xl px-4 md:px-8">
-        <ScrollReveal direction="up">
-          <p className="text-sm uppercase tracking-[0.2em] text-cyan-200">Gallery</p>
-          <h2 className="font-heading mt-3 text-3xl font-bold text-white sm:text-4xl">Snapshots</h2>
-        </ScrollReveal>
-
-        <Masonry
-          breakpointCols={breakpoints}
-          className="mt-8 flex gap-4"
-          columnClassName="flex flex-col gap-4"
-        >
-          {galleryData.map((item, index) => (
-            <ScrollReveal key={item.caption} direction="up" delay={index * 0.05}>
-              <article className="gallery-item group relative overflow-hidden rounded-2xl border border-white/15 bg-black/25">
-                <img
-                  src={item.src}
-                  alt={item.caption}
-                  className="w-full object-cover transition duration-500 group-hover:scale-105"
-                  loading="lazy"
-                  onError={(event) => {
-                    event.currentTarget.src = item.fallback;
-                  }}
-                />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 transition duration-300 group-hover:opacity-100">
-                  <p className="text-sm font-medium text-white">{item.caption}</p>
-                </div>
-              </article>
-            </ScrollReveal>
-          ))}
-        </Masonry>
+    <section id="gallery" className="section-shell py-24 px-6 md:px-16 max-w-6xl mx-auto">
+      <div className="mb-12">
+        <h2 className="font-heading text-3xl font-bold text-white mb-2">Gallery</h2>
+        <div
+          className="w-16 h-1 rounded-full"
+          style={{ background: "linear-gradient(90deg, #7c3aed, #06b6d4)" }}
+        />
       </div>
+
+      <Masonry
+        breakpointCols={breakpoints}
+        className="flex gap-4"
+        columnClassName="flex flex-col gap-4"
+      >
+        {galleryData.map((item, i) => {
+          const ref = useRef(null);
+          const inView = useInView(ref, { once: true, margin: "-5% 0px" });
+          return (
+            <motion.div
+              key={i}
+              ref={ref}
+              initial={{ opacity: 0, y: 30 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: 0.05 * i }}
+              className="gallery-item group relative overflow-hidden rounded-2xl cursor-pointer"
+            >
+              <img
+                src={item.src}
+                alt={item.caption}
+                className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4"
+                style={{ background: "linear-gradient(to top, rgba(4,2,11,0.9), transparent)" }}
+              >
+                <p className="text-white font-medium text-sm">{item.caption}</p>
+              </div>
+            </motion.div>
+          );
+        })}
+      </Masonry>
     </section>
   );
 }

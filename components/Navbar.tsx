@@ -1,104 +1,93 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { useEffect, useState } from "react";
 
-const navItems = [
-  { id: "home", label: "Home" },
-  { id: "about", label: "About" },
-  { id: "skills", label: "Skills" },
-  { id: "projects", label: "Projects" },
-  { id: "gallery", label: "Gallery" },
-  { id: "contact", label: "Contact" },
+const links = [
+  { label: "Home", href: "#home" },
+  { label: "About", href: "#about" },
+  { label: "Skills", href: "#skills" },
+  { label: "Projects", href: "#projects" },
+  { label: "Gallery", href: "#gallery" },
+  { label: "Contact", href: "#contact" },
 ];
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [activeId, setActiveId] = useState("home");
+  const [scrolled, setScrolled] = useState(false);
+  const [active, setActive] = useState("home");
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const sections = navItems
-      .map((item) => document.getElementById(item.id))
-      .filter((section): section is HTMLElement => Boolean(section));
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
-        });
-      },
-      {
-        threshold: 0.45,
-      },
-    );
-
-    sections.forEach((section) => observer.observe(section));
-
-    return () => observer.disconnect();
+    const fn = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", fn);
+    return () => window.removeEventListener("scroll", fn);
   }, []);
 
-  const scrollToSection = (id: string) => {
-    const section = document.getElementById(id);
-    if (!section) return;
-
-    section.scrollIntoView({ behavior: "smooth", block: "start" });
-    setIsOpen(false);
+  const go = (href: string) => {
+    setActive(href.replace("#", ""));
+    setOpen(false);
+    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 px-4 py-3 md:px-8">
-      <div className="glass-nav mx-auto flex max-w-6xl items-center justify-between rounded-2xl px-5 py-3">
-        <button
-          type="button"
-          onClick={() => scrollToSection("home")}
-          className="font-heading bg-gradient-to-r from-violet-400 via-cyan-300 to-violet-200 bg-clip-text text-xl font-extrabold tracking-tight text-transparent"
-        >
-          Ega.dev
-        </button>
+    <motion.nav
+      initial={{ y: -80 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className={`fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 py-3 glass-nav transition-all duration-300 ${
+        scrolled ? "shadow-lg shadow-black/30" : ""
+      }`}
+    >
+      <button
+        onClick={() => go("#home")}
+        className="text-xl font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent"
+      >
+        Ega.dev
+      </button>
 
-        <nav className="hidden items-center gap-7 md:flex">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => scrollToSection(item.id)}
-              className={`text-sm transition-colors ${
-                activeId === item.id ? "active-nav text-white" : "text-slate-300 hover:text-white"
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </nav>
+      <ul className="hidden md:flex items-center gap-6">
+        {links.map((l) => {
+          const isActive = active === l.href.replace("#", "");
+          return (
+            <li key={l.href}>
+              <button
+                onClick={() => go(l.href)}
+                className={`text-sm font-medium transition-colors duration-200 ${
+                  isActive ? "text-violet-400 active-nav" : "text-white/60 hover:text-white"
+                }`}
+              >
+                {l.label}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
 
-        <button
-          className="rounded-xl border border-white/20 p-2 text-slate-100 md:hidden"
-          type="button"
-          onClick={() => setIsOpen((prev) => !prev)}
-          aria-label="Toggle navigation menu"
-        >
-          {isOpen ? <X size={18} /> : <Menu size={18} />}
-        </button>
-      </div>
+      <button className="md:hidden text-white/70 hover:text-white" onClick={() => setOpen(!open)}>
+        {open ? <X size={22} /> : <Menu size={22} />}
+      </button>
 
-      {isOpen ? (
-        <div className="glass-nav mx-auto mt-2 flex max-w-6xl flex-col rounded-2xl px-5 py-4 md:hidden">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => scrollToSection(item.id)}
-              className={`py-2 text-left text-sm transition-colors ${
-                activeId === item.id ? "text-cyan-200" : "text-slate-200 hover:text-white"
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-      ) : null}
-    </header>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="absolute top-full inset-x-0 flex flex-col items-center gap-4 py-5 glass-nav"
+          >
+            {links.map((l) => (
+              <button
+                key={l.href}
+                onClick={() => go(l.href)}
+                className="text-sm font-medium text-white/70 hover:text-violet-400 transition-colors"
+              >
+                {l.label}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
   );
 }

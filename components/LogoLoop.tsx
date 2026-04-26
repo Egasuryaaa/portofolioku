@@ -1,9 +1,11 @@
-import InfiniteMarquee from "@/components/InfiniteMarquee";
+"use client";
+
+import InfiniteMarquee from "./InfiniteMarquee";
 
 const logos = [
   {
     name: "Laravel",
-    src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg",
+    src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-plain.svg",
   },
   {
     name: "Node.js",
@@ -30,29 +32,40 @@ const logos = [
     src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
   },
   {
-    name: "Tailwind",
-    src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg",
+    name: "PHP",
+    src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg",
+  },
+  {
+    name: "VS Code",
+    src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg",
   },
 ];
 
 export default function LogoLoop() {
   return (
-    <section className="section-shell pb-10">
-      <div className="mx-auto max-w-6xl px-4 md:px-8">
-        <div className="rounded-2xl border border-white/10 bg-black/15 py-5 backdrop-blur-sm">
-          <InfiniteMarquee speed={34} pauseOnHover={false}>
-            {logos.map((logo) => (
-              <div
-                key={logo.name}
-                className="flex min-w-[140px] items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3"
-              >
-                <img src={logo.src} alt={logo.name} className="h-6 w-6" loading="lazy" />
-                <span className="text-sm font-medium text-slate-100">{logo.name}</span>
-              </div>
-            ))}
-          </InfiniteMarquee>
-        </div>
-      </div>
-    </section>
+    <div className="section-shell relative py-6 overflow-hidden">
+      <div
+        className="absolute left-0 top-0 h-full w-20 z-10 pointer-events-none"
+        style={{ background: "linear-gradient(to right, var(--background), transparent)" }}
+      />
+      <div
+        className="absolute right-0 top-0 h-full w-20 z-10 pointer-events-none"
+        style={{ background: "linear-gradient(to left, var(--background), transparent)" }}
+      />
+
+      <InfiniteMarquee speed={40} pauseOnHover={false} direction="left">
+        {logos.map((logo) => (
+          <div key={logo.name} className="flex flex-col items-center gap-2 mx-8 select-none">
+            <img
+              src={logo.src}
+              alt={logo.name}
+              className="w-10 h-10 object-contain opacity-60 hover:opacity-100 transition-opacity"
+              draggable={false}
+            />
+            <span className="text-xs text-white/40">{logo.name}</span>
+          </div>
+        ))}
+      </InfiniteMarquee>
+    </div>
   );
 }

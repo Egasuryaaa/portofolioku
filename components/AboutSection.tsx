@@ -1,63 +1,76 @@
-import ScrollReveal from "@/components/ScrollReveal";
+"use client";
 
-const skillGroups = [
-  {
-    title: "Backend",
-    items: ["Laravel", "Node.js", "SQL"],
-  },
-  {
-    title: "Mobile & Frontend",
-    items: ["Flutter", "Figma"],
-  },
-  {
-    title: "Tools",
-    items: ["Git", "REST API", "Mind Mapping"],
-  },
-];
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
+
+const skills: Record<string, string[]> = {
+  Backend: ["Laravel", "Node.js", "SQL", "REST API"],
+  "Mobile & Frontend": ["Flutter", "Figma", "React"],
+  Tools: ["Git", "Mind Mapping", "Postman"],
+};
+
+function FadeUp({
+  children,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+}) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-10% 0px" });
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 40 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay }}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 export default function AboutSection() {
   return (
-    <section id="about" className="section-shell scroll-mt-28 py-14">
-      <div className="mx-auto max-w-6xl px-4 md:px-8">
-        <div className="grid gap-10 rounded-3xl border border-white/10 bg-black/20 p-7 backdrop-blur md:grid-cols-2 md:p-10">
-          <ScrollReveal direction="up">
-            <p className="text-sm uppercase tracking-[0.2em] text-cyan-200">About</p>
-            <h2 className="font-heading mt-3 text-3xl font-bold text-white sm:text-4xl">
-              Building Scalable Systems with Product Thinking
-            </h2>
-            <p className="mt-5 leading-relaxed text-slate-200">
-              I&apos;m currently in Semester 6 of D3 Informatics Engineering (graduating 2026). I
-              love building clean, scalable backend systems and exploring the full spectrum of
-              development from APIs to mobile apps.
-            </p>
-          </ScrollReveal>
+    <section id="about" className="section-shell py-24 px-6 md:px-16 max-w-6xl mx-auto">
+      <FadeUp>
+        <h2 className="font-heading text-3xl font-bold text-white mb-2">About Me</h2>
+        <div
+          className="w-16 h-1 rounded-full mb-10"
+          style={{ background: "linear-gradient(90deg, #7c3aed, #06b6d4)" }}
+        />
+      </FadeUp>
 
-          <div id="skills" className="scroll-mt-28">
-            <ScrollReveal direction="up" delay={0.1}>
-              <p className="text-sm uppercase tracking-[0.2em] text-violet-200">Skills</p>
-            </ScrollReveal>
+      <div className="grid md:grid-cols-2 gap-12 items-start">
+        <FadeUp delay={0.1}>
+          <p className="text-white/60 leading-relaxed mb-4">
+            I&apos;m currently in Semester 6 of D3 Informatics Engineering (graduating 2026). I love
+            building clean, scalable backend systems and exploring the full spectrum of development -
+            from APIs to mobile apps.
+          </p>
+          <p className="text-white/60 leading-relaxed">
+            I thrive in collaborative environments and enjoy solving real-world problems with clean,
+            maintainable code. Always eager to learn new technologies and take on challenging projects.
+          </p>
+        </FadeUp>
 
-            <div className="mt-4 space-y-5">
-              {skillGroups.map((group, groupIndex) => (
-                <ScrollReveal key={group.title} direction="up" delay={0.15 + groupIndex * 0.1}>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">
-                    {group.title}
-                  </p>
-                  <div className="flex flex-wrap gap-2.5">
-                    {group.items.map((item, itemIndex) => (
-                      <span
-                        key={item}
-                        className="inline-flex rounded-full border border-violet-300/35 bg-violet-500/10 px-4 py-2 text-sm text-violet-100"
-                        style={{ transitionDelay: `${itemIndex * 80}ms` }}
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </ScrollReveal>
-              ))}
-            </div>
-          </div>
+        <div className="space-y-6" id="skills">
+          {Object.entries(skills).map(([cat, items], ci) => (
+            <FadeUp key={cat} delay={0.1 * (ci + 1)}>
+              <p className="text-white/40 text-xs uppercase tracking-widest mb-3">{cat}</p>
+              <div className="flex flex-wrap gap-2">
+                {items.map((skill) => (
+                  <span
+                    key={skill}
+                    className="px-3 py-1 rounded-full text-sm font-medium text-white/80 border border-white/10 hover:border-violet-400/60 hover:text-white transition-all cursor-default"
+                    style={{ background: "rgba(124,58,237,0.1)" }}
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </FadeUp>
+          ))}
         </div>
       </div>
     </section>

@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 
 type ScrollVelocityProps = {
-  text: string;
+  text?: string;
+  texts?: string[];
   baseSpeed?: number;
+  velocity?: number;
   reverse?: boolean;
   className?: string;
 };
@@ -13,11 +15,16 @@ const clamp = (value: number, min: number, max: number) => Math.min(max, Math.ma
 
 export default function ScrollVelocity({
   text,
+  texts,
   baseSpeed = 70,
+  velocity,
   reverse = false,
   className,
 }: ScrollVelocityProps) {
-  const [duration, setDuration] = useState(Math.max(8, 160 / baseSpeed));
+  const speedBase = velocity ?? baseSpeed;
+  const sourceText = texts && texts.length > 0 ? texts.join(" ") : (text ?? "");
+
+  const [duration, setDuration] = useState(Math.max(8, 160 / speedBase));
 
   useEffect(() => {
     let lastY = window.scrollY;
@@ -29,7 +36,7 @@ export default function ScrollVelocity({
       const dt = Math.max(16, now - lastT);
       const velocity = dy / dt;
 
-      const dynamicSpeed = clamp(baseSpeed + velocity * 220, 40, 220);
+      const dynamicSpeed = clamp(speedBase + velocity * 220, 40, 220);
       setDuration(Math.max(6, 180 / dynamicSpeed));
 
       lastY = window.scrollY;
@@ -38,9 +45,9 @@ export default function ScrollVelocity({
 
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [baseSpeed]);
+  }, [speedBase]);
 
-  const repeated = new Array(6).fill(text);
+  const repeated = new Array(6).fill(sourceText);
 
   return (
     <div className="relative overflow-hidden">

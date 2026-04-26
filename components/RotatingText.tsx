@@ -7,6 +7,10 @@ type RotatingTextProps = {
   texts: string[];
   rotationInterval?: number;
   mainClassName?: string;
+  staggerFrom?: "first" | "last" | "center" | number;
+  staggerDuration?: number;
+  splitLevelClassName?: string;
+  transition?: unknown;
 };
 
 export default function RotatingText({
