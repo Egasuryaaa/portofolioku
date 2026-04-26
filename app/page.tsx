@@ -3,8 +3,10 @@
 import dynamic from "next/dynamic";
 import { useRef } from "react";
 import LiquidBackground from "@/components/LiquidBackground";
-import RotatingText from "@/components/RotatingText";
-import LogoLoop from "@/components/LogoLoop";
+import _RotatingText from "@/components/RotatingText";
+const RotatingText = _RotatingText as any;
+import _LogoLoop from "@/components/LogoLoop";
+const LogoLoop = _LogoLoop as any;
 import ScrollReveal from "@/components/ScrollReveal";
 import GradualBlur from "@/components/GradualBlur";
 
@@ -118,14 +120,15 @@ export default function Home() {
 
             {/* left */}
             <div>
-              <p className="text-white/50 text-lg mb-2">Hi, I&apos;m</p>
+              <p className="text-white/50 text-lg mb-2">Hi, I&am</p>
 
               <h1 className="font-heading text-5xl md:text-6xl font-bold text-white mb-4 leading-tight">
                 Ega Surya<br />Saputra
               </h1>
 
-              <div className="flex items-center gap-3 mb-6 text-xl font-semibold">
+              <div className="flex items-center gap-3 mb-6 text-xl md:text-2xl font-semibold">
                 <span className="text-white/40">I&apos;m a</span>
+                
                 <RotatingText
                   texts={[
                     "Frontend Developer",
@@ -134,10 +137,13 @@ export default function Home() {
                     "Laravel Enthusiast",
                     "Node.js Developer",
                   ]}
-                  mainClassName="text-violet-400"
+                  mainClassName="text-violet-400 overflow-hidden" /* Warna Ungu */
                   staggerFrom="last"
+                  initial={{ y: "100%" }}
+                  animate={{ y: 0 }}
+                  exit={{ y: "-120%" }}
                   staggerDuration={0.025}
-                  splitLevelClassName="overflow-hidden pb-0.5"
+                  splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1"
                   transition={{ type: "spring", damping: 30, stiffness: 400 }}
                   rotationInterval={2500}
                 />
@@ -218,7 +224,16 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 gap-12 items-start">
             <div>
-              <ScrollReveal containerClassName="" textClassName="text-white/60 text-lg">
+              {/* KUNCI: Jangan pakai scrollContainerRef di sini */}
+              {/* Agar teks sesuai desain Anda, saya timpa styling default dari CSS bawaan dengan textClassName */}
+              <ScrollReveal 
+                baseOpacity={0}
+                enableBlur={true}
+                baseRotation={3}
+                blurStrength={10}
+                containerClassName="m-0"
+                textClassName="text-white/60 text-lg font-normal tracking-normal"
+              >
                 I&apos;m currently in Semester 6 of D3 Informatics Engineering (graduating 2026).
                 I love building clean scalable backend systems and exploring the full spectrum of
                 development from APIs to mobile apps.

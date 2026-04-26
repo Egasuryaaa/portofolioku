@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useRef, useMemo } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -8,7 +10,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const ScrollReveal = ({
   children,
-  scrollContainerRef,
+  scrollContainerRef = null,
   enableBlur = true,
   baseOpacity = 0.1,
   baseRotation = 3,
