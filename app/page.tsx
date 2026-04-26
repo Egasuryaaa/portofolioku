@@ -64,7 +64,7 @@ export default function Home() {
   return (
     <div
       ref={containerRef}
-      className="relative min-h-screen overflow-x-clip text-slate-100"
+      className="relative isolate min-h-screen overflow-x-clip text-slate-100"
       style={{ backgroundColor: "#04020b" }}
     >
       {/* ── BACKGROUND ── */}
