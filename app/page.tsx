@@ -150,7 +150,7 @@ export default function Home() {
               </p>
 
               <div className="flex flex-wrap gap-4">
-                
+                <a
                   href="/cv.pdf"
                   download
                   className="px-6 py-3 rounded-xl font-semibold text-white hover:scale-105 transition-transform"
@@ -327,12 +327,6 @@ export default function Home() {
           <h2 className="font-heading text-3xl font-bold text-white mb-2">Gallery</h2>
           <div className="w-16 h-1 rounded-full mb-12" style={{ background: "linear-gradient(90deg,#7c3aed,#06b6d4)" }} />
 
-          {/* ── CARA GANTI GAMBAR ─────────────────────────
-              1. Taruh foto di public/gallery/
-              2. Rename: gallery-1.jpg … gallery-6.jpg
-              3. Ganti src di array di bawah:
-                 { src: "/gallery/gallery-1.jpg", caption: "..." }
-          ────────────────────────────────────────────── */}
           <div className="columns-1 sm:columns-2 md:columns-3 gap-4 space-y-4">
             {[
               { src: "https://picsum.photos/seed/ga1/600/800", caption: "Network Complaint System" },
@@ -370,7 +364,7 @@ export default function Home() {
               { label: "Phone",    value: "+62 822-5710-8680",      href: "tel:+6282257108680",              icon: "📞"  },
               { label: "Location", value: "Mojokerto, East Java",   href: null,                              icon: "📍"  },
             ].map(({ label, value, href, icon }) => (
-              
+              <a
                 key={label}
                 href={href ?? undefined}
                 target={href?.startsWith("http") ? "_blank" : undefined}
