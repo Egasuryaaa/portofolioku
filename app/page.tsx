@@ -443,6 +443,13 @@ export default function Home() {
               </div>
 
               <p className="text-white/30 text-xs mt-6 md:hidden">↓ Scroll ke bawah untuk interaksi robot 3D</p>
+              
+              {/* Spacer for robot landing zone on mobile */}
+              <div className="h-[250px] md:hidden w-full relative flex items-center justify-center">
+                <p className="text-white/10 text-xs font-medium tracking-widest uppercase select-none">
+                  🤖 Drag to rotate
+                </p>
+              </div>
             </div>
 
             {/* ── RIGHT COLUMN: Robot Landing Zone ── */}

@@ -24,7 +24,7 @@ function AnimatedModel({ url, scrollProgress, dragRotation }) {
   const { actions } = useAnimations(animations, group);
 
   // Smoothed values for damped interpolation
-  const smoothed = useRef({ x: -2.5, y: 1.5, z: 0, s: 1.3, ry: 0, opacity: 1 });
+  const smoothed = useRef({ x: -2.5, y: 1.5, z: 0, s: 1.3, rx: 0, ry: 0, opacity: 1 });
 
   // Play the first embedded animation if it exists
   useEffect(() => {
@@ -70,76 +70,75 @@ function AnimatedModel({ url, scrollProgress, dragRotation }) {
 
     const t = scrollProgress.get(); // 0 → 1
     const smoothing = 14; // damping factor (higher = snappier)
+    const isMobile = window.innerWidth < 768;
 
     // Optional: auto-rotate slowly when in contact section
     if (t > 0.85) {
-      dragRotation.current += dt * 0.5; // slow spin
+      dragRotation.current.y += dt * 0.3; // slow spin
     }
 
     // ── Target Y ──
     let targetY;
     if (t < 0.12) {
-      targetY = 1.5;                                                          // idle top-left
+      targetY = isMobile ? 3.0 : 1.5;                                         // higher on mobile to avoid text
     } else if (t < 0.25) {
       const p = easeInOutCubic((t - 0.12) / 0.13);
-      targetY = THREE.MathUtils.lerp(1.5, 4.5, p);                           // fly up out
+      targetY = THREE.MathUtils.lerp(isMobile ? 3.0 : 1.5, 4.5, p);           // fly up out
     } else if (t < 0.50) {
-      targetY = THREE.MathUtils.lerp(4.5, 3.0, (t - 0.25) / 0.25);          // drift high
+      targetY = THREE.MathUtils.lerp(4.5, 3.0, (t - 0.25) / 0.25);            // drift high
     } else if (t < 0.72) {
       const p = easeInOutCubic((t - 0.50) / 0.22);
-      targetY = THREE.MathUtils.lerp(3.0, -1.5, p);                          // descend to contact
+      targetY = THREE.MathUtils.lerp(3.0, isMobile ? -3.5 : -1.5, p);         // descend to contact
     } else {
-      targetY = -1.5;                                                         // settle in right column
+      targetY = isMobile ? -3.5 : -1.5;                                       // lower on mobile to be below cards
     }
 
     // ── Target X ──
     let targetX;
     if (t < 0.12) {
-      targetX = -2.5;                                                         // left side (hero)
+      targetX = isMobile ? 0 : -2.5;                                          // center on mobile, left on desktop
     } else if (t < 0.25) {
       const p = easeInOutCubic((t - 0.12) / 0.13);
-      targetX = THREE.MathUtils.lerp(-2.5, -0.5, p);                         // drift center
+      targetX = THREE.MathUtils.lerp(isMobile ? 0 : -2.5, -0.5, p);           // drift center
     } else if (t < 0.50) {
-      targetX = THREE.MathUtils.lerp(-0.5, 1.5, (t - 0.25) / 0.25);         // cross to right
+      targetX = THREE.MathUtils.lerp(-0.5, 1.5, (t - 0.25) / 0.25);           // cross to right
     } else if (t < 0.72) {
       const p = easeInOutCubic((t - 0.50) / 0.22);
-      targetX = THREE.MathUtils.lerp(1.5, 3.5, p);                           // land in right column
+      targetX = THREE.MathUtils.lerp(1.5, isMobile ? 0 : 3.5, p);             // center on mobile, right on desktop
     } else {
-      targetX = 3.5;                                                          // right column of contact
+      targetX = isMobile ? 0 : 3.5;
     }
 
     // ── Target Scale (bigger overall) ──
     let targetS;
     if (t < 0.12) {
-      targetS = 1.8;                                                          // hero size
+      targetS = isMobile ? 1.0 : 1.8;                                         // hero size (smaller on mobile)
     } else if (t < 0.25) {
       const p = easeInOutCubic((t - 0.12) / 0.13);
-      targetS = THREE.MathUtils.lerp(1.8, 0.5, p);                           // shrink
+      targetS = THREE.MathUtils.lerp(isMobile ? 1.0 : 1.8, 0.5, p);          // shrink
     } else if (t < 0.50) {
-      targetS = THREE.MathUtils.lerp(0.5, 1.3, (t - 0.25) / 0.25);          // grow mid
+      targetS = THREE.MathUtils.lerp(0.5, 1.3, (t - 0.25) / 0.25);           // grow mid
     } else if (t < 0.72) {
       const p = easeInOutCubic((t - 0.50) / 0.22);
-      targetS = THREE.MathUtils.lerp(1.3, 2.0, p);                           // settle contact
+      targetS = THREE.MathUtils.lerp(1.3, isMobile ? 1.8 : 2.8, p);          // settle contact (huge increase +40%)
     } else {
-      targetS = 2.0;                                                          // contact size
+      targetS = isMobile ? 1.8 : 2.8;                                         // contact size
     }
 
     // ── Target Rotation Y (elegant spin) ──
     let targetRY;
     if (t < 0.12) {
       targetRY = 0;
-    } else if (t < 0.50) {
-      const p = (t - 0.12) / 0.38;
-      targetRY = p * Math.PI * 4;                                             // 2 full spins
     } else if (t < 0.72) {
-      const p = easeInOutCubic((t - 0.50) / 0.22);
-      targetRY = THREE.MathUtils.lerp(Math.PI * 4, Math.PI * 4.5, p);        // half extra spin settling
+      const p = easeInOutCubic((t - 0.12) / 0.60);
+      targetRY = p * Math.PI * 4;                                             // exactly 2 full spins while scrolling
     } else {
-      targetRY = Math.PI * 4.5;
+      targetRY = Math.PI * 4; // exactly facing forward correctly!
     }
     
     // Add the interactive drag rotation (only kicks in heavily at contact section)
-    targetRY += dragRotation.current;
+    targetRY += dragRotation.current.y;
+    let targetRX = dragRotation.current.x;
 
     // ── Target Opacity ──
     let targetOpacity;
@@ -162,12 +161,14 @@ function AnimatedModel({ url, scrollProgress, dragRotation }) {
       s.x       = targetX;
       s.y       = targetY;
       s.s       = targetS;
+      s.rx      = targetRX;
       s.ry      = targetRY;
       s.opacity = targetOpacity;
     } else {
       s.x       = damp(s.x,       targetX,       smoothing, dt);
       s.y       = damp(s.y,       targetY,       smoothing, dt);
       s.s       = damp(s.s,       targetS,       smoothing, dt);
+      s.rx      = damp(s.rx,      targetRX,      smoothing, dt);
       s.ry      = damp(s.ry,      targetRY,      smoothing, dt);
       s.opacity = damp(s.opacity, targetOpacity, smoothing * 1.5, dt);
     }
@@ -175,6 +176,7 @@ function AnimatedModel({ url, scrollProgress, dragRotation }) {
     // Apply transforms
     group.current.position.set(s.x, s.y, 0);
     group.current.scale.setScalar(s.s);
+    group.current.rotation.x = s.rx;
     group.current.rotation.y = s.ry;
 
     // Apply opacity to all materials
@@ -222,22 +224,26 @@ export default function ScrollModel3D({ modelUrl = "/assets/asset3drobot.glb" })
   const isAtContactRef = useRef(false);
 
   // Drag-to-rotate state
-  const dragRotation = useRef(0);
+  const dragRotation = useRef({ x: 0, y: 0 });
   const isDragging = useRef(false);
-  const previousX = useRef(0);
+  const previousPointer = useRef({ x: 0, y: 0 });
 
   // Handle dragging
   useEffect(() => {
     function onPointerDown(e) {
       if (!isAtContactRef.current) return;
       isDragging.current = true;
-      previousX.current = e.clientX;
+      previousPointer.current = { x: e.clientX, y: e.clientY };
     }
     function onPointerMove(e) {
       if (!isDragging.current) return;
-      const deltaX = e.clientX - previousX.current;
-      dragRotation.current += deltaX * 0.01; // sensitivity
-      previousX.current = e.clientX;
+      const deltaX = e.clientX - previousPointer.current.x;
+      const deltaY = e.clientY - previousPointer.current.y;
+      
+      dragRotation.current.y += deltaX * 0.01; // horizontal rotation
+      dragRotation.current.x += deltaY * 0.01; // vertical rotation
+      
+      previousPointer.current = { x: e.clientX, y: e.clientY };
     }
     function onPointerUp() {
       isDragging.current = false;
