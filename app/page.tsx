@@ -15,6 +15,7 @@ import TextType from "@/components/TextType";
 // SSR: false untuk component yang pakai WebGL / window
 const LiquidEther = dynamic(() => import("@/components/LiquidEther"), { ssr: false });
 const Lanyard = dynamic(() => import("@/components/Lanyard"), { ssr: false });
+const ScrollModel3D = dynamic(() => import("@/components/ScrollModel3D"), { ssr: false });
 
 // ─── data ────────────────────────────────────────────────────────────────────
 
@@ -92,6 +93,9 @@ export default function Home() {
           resolution={0.5}
         />
       </div>
+
+      {/* ── 3D SCROLL MODEL ── */}
+      <ScrollModel3D />
 
       {/* ── NAVBAR ── */}
       <header className="fixed top-0 inset-x-0 z-50 flex justify-center px-2 pt-3">
@@ -406,32 +410,55 @@ export default function Home() {
             CONTACT
         ══════════════════════════════════════════ */}
         <section id="contact" className="section-shell py-24 px-6 md:px-16 max-w-6xl mx-auto">
-          <h2 className="font-heading text-3xl font-bold text-white mb-2">Contact</h2>
-          <div className="w-16 h-1 rounded-full mb-12" style={{ background: "linear-gradient(90deg,#7c3aed,#06b6d4)" }} />
+          <div className="flex flex-col md:flex-row gap-12 items-start">
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: "Email",    value: "egasurya04@gmail.com",  href: "mailto:egasurya04@gmail.com",     icon: "✉️"  },
-              { label: "GitHub",   value: "github.com/Egasuryaaa", href: "https://github.com/Egasuryaaa",   icon: "🐙"  },
-              { label: "Phone",    value: "+62 822-5710-8680",      href: "tel:+6282257108680",              icon: "📞"  },
-              { label: "Location", value: "Mojokerto, East Java",   href: null,                              icon: "📍"  },
-            ].map(({ label, value, href, icon }) => (
-              <a
-                key={label}
-                href={href ?? undefined}
-                target={href?.startsWith("http") ? "_blank" : undefined}
-                rel="noreferrer"
-                className={`flex flex-col gap-3 p-5 rounded-2xl border border-white/10 transition-all duration-300
-                  ${href ? "hover:border-violet-400/50 hover:-translate-y-1 cursor-pointer" : "cursor-default"}`}
-                style={{ background: "rgba(255,255,255,.03)", backdropFilter: "blur(8px)" }}
-              >
-                <span className="text-2xl">{icon}</span>
-                <div>
-                  <p className="text-white/40 text-xs uppercase tracking-wider mb-1">{label}</p>
-                  <p className="text-white/80 text-sm font-medium break-all">{value}</p>
-                </div>
-              </a>
-            ))}
+            {/* ── LEFT COLUMN: Title + Contact Cards ── */}
+            <div className="flex-1 min-w-0">
+              <h2 className="font-heading text-3xl font-bold text-white mb-2">Contact</h2>
+              <div className="w-16 h-1 rounded-full mb-12" style={{ background: "linear-gradient(90deg,#7c3aed,#06b6d4)" }} />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                  { label: "Email",    value: "egasurya04@gmail.com",  href: "mailto:egasurya04@gmail.com",     icon: "✉️"  },
+                  { label: "GitHub",   value: "github.com/Egasuryaaa", href: "https://github.com/Egasuryaaa",   icon: "🐙"  },
+                  { label: "Phone",    value: "+62 822-5710-8680",      href: "https://wa.me/6282257108680?text=Halo%20Ega,%20saya%20tertarik%20dengan%20portfolio%20Anda!",     icon: "📞"  },
+                  { label: "Location", value: "Mojokerto, East Java",   href: null,                              icon: "📍"  },
+                ].map(({ label, value, href, icon }) => (
+                  <a
+                    key={label}
+                    href={href ?? undefined}
+                    target={href?.startsWith("http") ? "_blank" : undefined}
+                    rel="noreferrer"
+                    className={`relative z-20 flex flex-col gap-3 p-5 rounded-2xl border border-white/10 transition-all duration-300
+                      ${href ? "hover:border-violet-400/50 hover:-translate-y-1 cursor-pointer" : "cursor-default"}`}
+                    style={{ background: "rgba(255,255,255,.03)", backdropFilter: "blur(8px)" }}
+                  >
+                    <span className="text-2xl">{icon}</span>
+                    <div>
+                      <p className="text-white/40 text-xs uppercase tracking-wider mb-1">{label}</p>
+                      <p className="text-white/80 text-sm font-medium break-all">{value}</p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+
+              <p className="text-white/30 text-xs mt-6 md:hidden">↓ Scroll ke bawah untuk interaksi robot 3D</p>
+            </div>
+
+            {/* ── RIGHT COLUMN: Robot Landing Zone ── */}
+            <div className="hidden md:flex w-[320px] lg:w-[380px] shrink-0 h-[350px] items-center justify-center relative">
+              {/* Visual hint — subtle glow where robot lands */}
+              <div
+                className="absolute inset-0 rounded-3xl opacity-30 pointer-events-none"
+                style={{
+                  background: "radial-gradient(ellipse at center, rgba(124,58,237,.15) 0%, transparent 70%)",
+                }}
+              />
+              <p className="text-white/10 text-xs font-medium tracking-widest uppercase select-none">
+                🤖 Drag to rotate
+              </p>
+            </div>
+
           </div>
         </section>
 
