@@ -1,3 +1,5 @@
+"use client";
+
 import { useLayoutEffect, useRef, useCallback } from 'react';
 import Lenis from 'lenis';
 import './ScrollStack.css';
@@ -62,8 +64,13 @@ const ScrollStack = ({
   const getElementOffset = useCallback(
     element => {
       if (useWindowScroll) {
-        const rect = element.getBoundingClientRect();
-        return rect.top + window.scrollY;
+        let top = 0;
+        let el = element;
+        while (el) {
+          top += el.offsetTop || 0;
+          el = el.offsetParent;
+        }
+        return top;
       } else {
         return element.offsetTop;
       }

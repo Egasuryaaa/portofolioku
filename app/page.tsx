@@ -9,6 +9,8 @@ import _LogoLoop from "@/components/LogoLoop";
 const LogoLoop = _LogoLoop as any;
 import ScrollReveal from "@/components/ScrollReveal";
 import GradualBlur from "@/components/GradualBlur";
+import ScrollStack, { ScrollStackItem } from "@/components/ScrollStack";
+import TextType from "@/components/TextType";
 
 // SSR: false untuk component yang pakai WebGL / window
 const LiquidEther = dynamic(() => import("@/components/LiquidEther"), { ssr: false });
@@ -17,7 +19,7 @@ const Lanyard = dynamic(() => import("@/components/Lanyard"), { ssr: false });
 // ─── data ────────────────────────────────────────────────────────────────────
 
 const logos = [
-  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-plain.svg",   alt: "Laravel"   },
+  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg",   alt: "Laravel"   },
   { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",  alt: "Node.js"   },
   { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg",alt: "Flutter"   },
   { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",    alt: "MySQL"     },
@@ -25,7 +27,6 @@ const logos = [
   { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg",    alt: "Figma"     },
   { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",    alt: "React"     },
   { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg",        alt: "PHP"       },
-  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg",  alt: "VS Code"   },
 ];
 
 const skills: Record<string, string[]> = {
@@ -59,10 +60,11 @@ const projects = [
 ];
 
 const navLinks = [
-  { label: "Home", href: "#home" },
+  { label: "Home", href: "#hero" },
   { label: "About", href: "#about" },
+  { label: "Skills", href: "#skills" },
   { label: "Projects", href: "#projects" },
-  { label: "Gallery", href: "#gallery" },
+  { label: "Experience", href: "#experience" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -97,9 +99,9 @@ export default function Home() {
           <div className="no-scrollbar flex items-center gap-2 overflow-x-auto md:gap-6">
             <span
               className="shrink-0 text-lg font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent cursor-pointer"
-              onClick={() => document.querySelector("#home")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => document.querySelector("#hero")?.scrollIntoView({ behavior: "smooth" })}
             >
-              Ega.dev
+              Ga.Tech
             </span>
 
             {navLinks.map((l) => (
@@ -120,14 +122,14 @@ export default function Home() {
         {/* ══════════════════════════════════════════
             HERO
         ══════════════════════════════════════════ */}
-        <section id="home" className="section-shell min-h-screen flex items-center pt-24 px-6 md:px-16 max-w-6xl mx-auto">
+        <section id="hero" className="section-shell min-h-screen flex items-center pt-24 px-6 md:px-16 max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center w-full">
 
             {/* left */}
             <div>
-              <p className="text-white/50 text-lg mb-2">Hi, I&am</p>
+              <p className="text-white/50 text-lg mb-2">Hi, I&apos;m</p>
 
-              <h1 className="font-heading text-5xl md:text-6xl font-bold text-white mb-4 leading-tight">
+              <h1 className="font-heading text-5xl md:text-7xl font-bold text-white mb-4 leading-tight">
                 Ega Surya<br />Saputra
               </h1>
 
@@ -154,11 +156,14 @@ export default function Home() {
                 />
               </div>
 
-              <p className="text-white/60 leading-relaxed mb-8 max-w-lg">
-                Motivated D3 Informatics Engineering student with hands-on experience building
-                RESTful APIs, web applications, and mobile apps using Laravel, Node.js, and Flutter.
-                Based in Mojokerto, East Java.
-              </p>
+              <TextType 
+                as="p"
+                className="text-white/60 leading-relaxed mb-8 max-w-lg min-h-[120px] md:min-h-[84px]"
+                text="Motivated D3 Informatics Engineering student with hands-on experience building RESTful APIs, web applications, and mobile apps using Laravel, Node.js, and Flutter. Based in Mojokerto, East Java."
+                typingSpeed={30}
+                loop={false}
+                showCursor={true}
+              />
 
               <div className="flex flex-wrap gap-4">
                 <a
@@ -180,7 +185,7 @@ export default function Home() {
             </div>
 
             {/* right — Lanyard 3D card */}
-            <div className="flex justify-center md:justify-end" style={{ height: 480 }}>
+            <div className="flex justify-center md:justify-end h-[350px] md:h-[480px]">
               <Lanyard position={[0, 0, 20]} gravity={[0, -40, 0]} fov={20} transparent />
             </div>
           </div>
@@ -227,49 +232,57 @@ export default function Home() {
           <h2 className="font-heading text-3xl font-bold text-white mb-2">About Me</h2>
           <div className="w-16 h-1 rounded-full mb-10" style={{ background: "linear-gradient(90deg,#7c3aed,#06b6d4)" }} />
 
-          <div className="grid md:grid-cols-2 gap-12 items-start">
-            <div>
-              {/* KUNCI: Jangan pakai scrollContainerRef di sini */}
-              {/* Agar teks sesuai desain Anda, saya timpa styling default dari CSS bawaan dengan textClassName */}
-              <ScrollReveal 
-                baseOpacity={0}
-                enableBlur={true}
-                baseRotation={3}
-                blurStrength={10}
-                containerClassName="m-0"
-                textClassName="text-white/60 text-lg font-normal tracking-normal"
-              >
-                I&apos;m currently in Semester 6 of D3 Informatics Engineering (graduating 2026).
-                I love building clean scalable backend systems and exploring the full spectrum of
-                development from APIs to mobile apps.
-              </ScrollReveal>
-            </div>
+          <div className="max-w-2xl">
+            {/* KUNCI: Jangan pakai scrollContainerRef di sini */}
+            {/* Agar teks sesuai desain Anda, saya timpa styling default dari CSS bawaan dengan textClassName */}
+            <ScrollReveal 
+              baseOpacity={0}
+              enableBlur={true}
+              baseRotation={3}
+              blurStrength={10}
+              containerClassName="m-0"
+              textClassName="text-white/60 text-xl md:text-2xl font-medium tracking-wide leading-relaxed"
+              rotationEnd="bottom 40%"
+              wordAnimationEnd="bottom 40%"
+            >
+              I&apos;m currently in Semester 6 of D3 Informatics Engineering (graduating 2026).
+              I love building clean scalable backend systems and exploring the full spectrum of
+              development from APIs to mobile apps.
+            </ScrollReveal>
+          </div>
+        </section>
 
-            <div className="space-y-6">
-              {Object.entries(skills).map(([cat, items]) => (
-                <div key={cat}>
-                  <p className="text-white/40 text-xs uppercase tracking-widest mb-3">{cat}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {items.map((s) => (
-                      <span
-                        key={s}
-                        className="px-3 py-1 rounded-full text-sm font-medium text-white/80 border border-white/10 hover:border-violet-400/60 hover:text-white transition-all cursor-default"
-                        style={{ background: "rgba(124,58,237,.1)" }}
-                      >
-                        {s}
-                      </span>
-                    ))}
-                  </div>
+        {/* ══════════════════════════════════════════
+            SKILLS
+        ══════════════════════════════════════════ */}
+        <section id="skills" className="section-shell py-24 px-6 md:px-16 max-w-6xl mx-auto">
+          <h2 className="font-heading text-3xl font-bold text-white mb-2">Skills</h2>
+          <div className="w-16 h-1 rounded-full mb-10" style={{ background: "linear-gradient(90deg,#7c3aed,#06b6d4)" }} />
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
+            {Object.entries(skills).map(([cat, items]) => (
+              <div key={cat}>
+                <p className="text-white/40 text-xs uppercase tracking-widest mb-3">{cat}</p>
+                <div className="flex flex-wrap gap-2">
+                  {items.map((s) => (
+                    <span
+                      key={s}
+                      className="px-3 py-1 rounded-full text-sm font-medium text-white/80 border border-white/10 hover:border-violet-400/60 hover:text-white transition-all cursor-default"
+                      style={{ background: "rgba(124,58,237,.1)" }}
+                    >
+                      {s}
+                    </span>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </section>
 
         {/* ══════════════════════════════════════════
             EXPERIENCE
         ══════════════════════════════════════════ */}
-        <section className="section-shell py-24 px-6 md:px-16 max-w-6xl mx-auto">
+        <section id="experience" className="section-shell py-24 px-6 md:px-16 max-w-6xl mx-auto">
           <h2 className="font-heading text-3xl font-bold text-white mb-2">Experience</h2>
           <div className="w-16 h-1 rounded-full mb-12" style={{ background: "linear-gradient(90deg,#7c3aed,#06b6d4)" }} />
 
@@ -311,30 +324,49 @@ export default function Home() {
           <h2 className="font-heading text-3xl font-bold text-white mb-2">Projects</h2>
           <div className="w-16 h-1 rounded-full mb-12" style={{ background: "linear-gradient(90deg,#7c3aed,#06b6d4)" }} />
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {projects.map((p) => (
-              <div
-                key={p.title}
-                className="group rounded-2xl p-6 border border-white/10 hover:border-violet-400/50 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 flex flex-col"
-                style={{ background: "rgba(255,255,255,.03)", backdropFilter: "blur(8px)" }}
-              >
-                <div className="text-3xl mb-4">{p.icon}</div>
-                <h3 className="font-heading text-white font-semibold mb-1">{p.title}</h3>
-                <p className="text-violet-400 text-sm mb-3">{p.subtitle}</p>
-                <p className="text-white/55 text-sm leading-relaxed flex-grow">{p.desc}</p>
-                <div className="flex flex-wrap gap-2 mt-5">
-                  {p.tags.map((t) => (
-                    <span
-                      key={t}
-                      className="text-xs px-2 py-1 rounded-md text-cyan-400 border border-cyan-400/20"
-                      style={{ background: "rgba(6,182,212,.08)" }}
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
+          <div className="w-full">
+            <ScrollStack
+              useWindowScroll={true}
+              itemScale={0.05}
+              itemStackDistance={40}
+              stackPosition="20%"
+              scaleEndPosition="10%"
+              baseScale={0.85}
+              rotationAmount={2}
+              blurAmount={2}
+              onStackComplete={() => {}}
+            >
+              {projects.map((p, i) => (
+                <ScrollStackItem 
+                  key={p.title} 
+                  itemClassName="!p-0 flex flex-col md:flex-row !h-auto min-h-[450px] md:min-h-[400px] bg-[#0f0a19]/90 backdrop-blur-[12px] border border-white/10 rounded-[30px] md:rounded-[40px] overflow-hidden"
+                >
+                  {/* IMAGE PLACEHOLDER */}
+                  <div className="w-full md:w-5/12 h-[220px] md:h-auto bg-white/5 relative flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10">
+                    <span className="text-white/20 text-sm font-medium tracking-widest uppercase">Insert Image Here</span>
+                  </div>
+
+                  {/* TEXT CONTENT */}
+                  <div className="p-6 md:p-10 flex-1 flex flex-col">
+                    <div className="text-4xl md:text-5xl mb-4 md:mb-6">{p.icon}</div>
+                    <h3 className="font-heading text-white font-bold text-xl md:text-3xl mb-2">{p.title}</h3>
+                    <p className="text-violet-400 text-xs md:text-sm mb-4 md:mb-5 font-semibold tracking-wider uppercase">{p.subtitle}</p>
+                    <p className="text-white/70 text-sm md:text-base leading-relaxed flex-grow">{p.desc}</p>
+                    <div className="flex flex-wrap gap-2 md:gap-3 mt-5 md:mt-8">
+                      {p.tags.map((t) => (
+                        <span
+                          key={t}
+                          className="text-[10px] md:text-xs px-3 py-1.5 rounded-lg text-cyan-300 border border-cyan-400/30 font-medium tracking-wide"
+                          style={{ background: "rgba(6,182,212,.1)" }}
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </ScrollStackItem>
+              ))}
+            </ScrollStack>
           </div>
         </section>
 
@@ -408,7 +440,7 @@ export default function Home() {
       {/* ── FOOTER ── */}
       <footer className="relative z-10 py-8 text-center border-t border-white/10">
         <p className="text-white/30 text-sm">
-          Built with ❤️ by <span className="text-violet-400 font-medium">Ega Surya Saputra</span>
+          Built in Indonesia by <span className="text-violet-400 font-medium">Ega Surya Saputra</span>
           {" "}· © {new Date().getFullYear()}
         </p>
       </footer>
