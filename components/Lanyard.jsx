@@ -162,6 +162,12 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
               );
             }}
           >
+            {/* Hitbox masif tak kasat mata agar sangat mudah ditarik di layar HP */}
+            <mesh visible={false}>
+              <boxGeometry args={[2, 3, 1.5]} />
+              <meshBasicMaterial transparent opacity={0} />
+            </mesh>
+
             <mesh geometry={nodes.card.geometry}>
               <meshPhysicalMaterial
                 map={materials.base.map}

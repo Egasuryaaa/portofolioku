@@ -1,30 +1,13 @@
-"use client";
-
-import { useRef, useEffect, useState, useCallback, Suspense } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useGLTF, useAnimations } from "@react-three/drei";
+import { useRef, useEffect, useState, Suspense } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { useGLTF, useAnimations, Float, PresentationControls } from "@react-three/drei";
+import { useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import * as THREE from "three";
 
-// ─── Smooth easing helper ─────────────────────────────────────────────────────
-// Ease-in-out cubic for buttery smooth transitions
-function easeInOutCubic(t) {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-}
-
-// Smoothly interpolate a value toward a target each frame (damping)
-function damp(current, target, smoothing, dt) {
-  return THREE.MathUtils.lerp(current, target, 1 - Math.exp(-smoothing * dt));
-}
-
-// ─── Inner 3D Scene (runs inside Canvas) ──────────────────────────────────────
-
-function AnimatedModel({ url, scrollProgress, dragRotation }) {
+function AnimatedModel({ url, scrollYProgress, isMobile, isAtContact }) {
   const group = useRef();
   const { scene, animations } = useGLTF(url);
   const { actions } = useAnimations(animations, group);
-
-  // Smoothed values for damped interpolation
-  const smoothed = useRef({ x: -2.5, y: 1.5, z: 0, s: 1.3, rx: 0, ry: 0, opacity: 1 });
 
   // Play the first embedded animation if it exists
   useEffect(() => {
@@ -32,255 +15,117 @@ function AnimatedModel({ url, scrollProgress, dragRotation }) {
     if (firstAction) {
       firstAction.reset().fadeIn(0.5).play();
     }
-    return () => {
-      const a = Object.values(actions)[0];
-      if (a) a.fadeOut(0.5);
-    };
   }, [actions]);
 
-  const materialRefs = useRef([]);
-
-  // Gather all mesh materials once & enable transparency
+  // Ensure transparent materials
   useEffect(() => {
-    const mats = [];
     scene.traverse((child) => {
       if (child.isMesh && child.material) {
         child.material = child.material.clone();
         child.material.transparent = true;
-        mats.push(child.material);
       }
     });
-    materialRefs.current = mats;
   }, [scene]);
 
-  // ── Animation phases ──────────────────────────────────────────────────────
-  //
-  // Phase 1  (0.00 → 0.20)  Hero:    left-top, visible, subtle idle
-  // Phase 2  (0.20 → 0.35)  Exit:    move UP + scale down + fade out
-  // Phase 3  (0.35 → 0.60)  Hidden:  invisible, rotating in void
-  // Phase 4  (0.60 → 0.80)  Return:  fade in + move to RIGHT-BOTTOM
-  // Phase 5  (0.80 → 1.00)  Contact: settle at right of contact cards
-  //
-  // Start position : X=-2.5  Y=1.5   (top-left)
-  // End position   : X=2.5   Y=-1.2  (right of contact cards)
+  // ─── Keyframe Mapping (0, 0.33, 0.66, 1) ─────────────────────────────────
+  // Based on user request:
+  // 0.00: Hero (X: -2.5, Y: 1.5, Z: 0, ry: 0)
+  // 0.33: About/Skills (X: 4.0, Y: 0.5, Z: -1, ry: -0.5, rz: -0.1)
+  // 0.66: Projects/Gallery (X: 6.0, Y: 0, Z: 1, ry: 0.5, rz: -0.2)
+  // 1.00: Contact (X: 3.5, Y: -1.5, Z: 0, ry: 0, rz: 0)
 
-  useFrame((_, delta) => {
-    if (!group.current) return;
-    const dt = Math.min(delta, 0.1); // clamp for tab-switch spikes
+  // X Position
+  const xDesk = [-2.6, 4.0, 5.5, 2.8]; // Adjusted 2.8 for perfect symmetry in Contact column
+  const xMob  = [1.2, -1.0, 1.2, 0];
+  const x = useTransform(scrollYProgress, [0, 0.33, 0.66, 1], isMobile ? xMob : xDesk);
 
-    const t = scrollProgress.get(); // 0 → 1
-    const smoothing = 14; // damping factor (higher = snappier)
-    const isMobile = window.innerWidth < 768;
+  // Y Position
+  const yDesk = [1.5, 0.5, 0, -1.5];
+  const yMob  = [1.4, 2.0, 1.8, -2.0];
+  const y = useTransform(scrollYProgress, [0, 0.33, 0.66, 1], isMobile ? yMob : yDesk);
 
-    // Optional: auto-rotate slowly when in contact section
-    if (t > 0.85) {
-      dragRotation.current.y += dt * 0.3; // slow spin
+  // Z Position
+  const zDesk = [0, -1, 1, 0];
+  const z = useTransform(scrollYProgress, [0, 0.33, 0.66, 1], zDesk);
+
+  // Rotations
+  // A perfect 360-degree horizontal spin (Math.PI * 2) precisely completed when arriving at Contact
+  const ry = useTransform(scrollYProgress, [0, 1], [0, Math.PI * 2]);
+  const rz = useTransform(scrollYProgress, [0, 0.33, 0.66, 1], [0, -0.1, -0.2, 0]);
+
+  // Scale (Bigger at the end)
+  const sDesk = [1.5, 1.2, 0.8, 2.5];
+  const sMob  = [1.5, 1.2, 0.9, 2.4];
+  const scale = useTransform(scrollYProgress, [0, 0.33, 0.66, 1], isMobile ? sMob : sDesk);
+
+  // Apply mapped Framer Motion values seamlessly into the 3D world per-frame
+  useFrame(() => {
+    if (group.current) {
+      group.current.position.set(x.get(), y.get(), z.get());
+      group.current.rotation.set(0, ry.get(), rz.get());
+      group.current.scale.setScalar(scale.get());
     }
-
-    // ── Target Y ──
-    let targetY;
-    if (t < 0.12) {
-      targetY = isMobile ? 3.0 : 1.5;                                         // higher on mobile to avoid text
-    } else if (t < 0.25) {
-      const p = easeInOutCubic((t - 0.12) / 0.13);
-      targetY = THREE.MathUtils.lerp(isMobile ? 3.0 : 1.5, 4.5, p);           // fly up out
-    } else if (t < 0.50) {
-      targetY = THREE.MathUtils.lerp(4.5, 3.0, (t - 0.25) / 0.25);            // drift high
-    } else if (t < 0.72) {
-      const p = easeInOutCubic((t - 0.50) / 0.22);
-      targetY = THREE.MathUtils.lerp(3.0, isMobile ? -3.5 : -1.5, p);         // descend to contact
-    } else {
-      targetY = isMobile ? -3.5 : -1.5;                                       // lower on mobile to be below cards
-    }
-
-    // ── Target X ──
-    let targetX;
-    if (t < 0.12) {
-      targetX = isMobile ? 0 : -2.5;                                          // center on mobile, left on desktop
-    } else if (t < 0.25) {
-      const p = easeInOutCubic((t - 0.12) / 0.13);
-      targetX = THREE.MathUtils.lerp(isMobile ? 0 : -2.5, -0.5, p);           // drift center
-    } else if (t < 0.50) {
-      targetX = THREE.MathUtils.lerp(-0.5, 1.5, (t - 0.25) / 0.25);           // cross to right
-    } else if (t < 0.72) {
-      const p = easeInOutCubic((t - 0.50) / 0.22);
-      targetX = THREE.MathUtils.lerp(1.5, isMobile ? 0 : 3.5, p);             // center on mobile, right on desktop
-    } else {
-      targetX = isMobile ? 0 : 3.5;
-    }
-
-    // ── Target Scale (bigger overall) ──
-    let targetS;
-    if (t < 0.12) {
-      targetS = isMobile ? 1.0 : 1.8;                                         // hero size (smaller on mobile)
-    } else if (t < 0.25) {
-      const p = easeInOutCubic((t - 0.12) / 0.13);
-      targetS = THREE.MathUtils.lerp(isMobile ? 1.0 : 1.8, 0.5, p);          // shrink
-    } else if (t < 0.50) {
-      targetS = THREE.MathUtils.lerp(0.5, 1.3, (t - 0.25) / 0.25);           // grow mid
-    } else if (t < 0.72) {
-      const p = easeInOutCubic((t - 0.50) / 0.22);
-      targetS = THREE.MathUtils.lerp(1.3, isMobile ? 1.8 : 2.8, p);          // settle contact (huge increase +40%)
-    } else {
-      targetS = isMobile ? 1.8 : 2.8;                                         // contact size
-    }
-
-    // ── Target Rotation Y (elegant spin) ──
-    let targetRY;
-    if (t < 0.12) {
-      targetRY = 0;
-    } else if (t < 0.72) {
-      const p = easeInOutCubic((t - 0.12) / 0.60);
-      targetRY = p * Math.PI * 4;                                             // exactly 2 full spins while scrolling
-    } else {
-      targetRY = Math.PI * 4; // exactly facing forward correctly!
-    }
-    
-    // Add the interactive drag rotation (only kicks in heavily at contact section)
-    targetRY += dragRotation.current.y;
-    let targetRX = dragRotation.current.x;
-
-    // ── Target Opacity ──
-    let targetOpacity;
-    if (t < 0.10) {
-      targetOpacity = 1;
-    } else if (t < 0.22) {
-      targetOpacity = THREE.MathUtils.lerp(1, 0, (t - 0.10) / 0.12);
-    } else if (t < 0.48) {
-      targetOpacity = 0;
-    } else if (t < 0.65) {
-      targetOpacity = THREE.MathUtils.lerp(0, 1, (t - 0.48) / 0.17);
-    } else {
-      targetOpacity = 1;
-    }
-
-    // ── Apply damped smoothing (snap when settled at contact) ──
-    const s = smoothed.current;
-    if (t > 0.72) {
-      // Snap directly — no more damping lag at contact section
-      s.x       = targetX;
-      s.y       = targetY;
-      s.s       = targetS;
-      s.rx      = targetRX;
-      s.ry      = targetRY;
-      s.opacity = targetOpacity;
-    } else {
-      s.x       = damp(s.x,       targetX,       smoothing, dt);
-      s.y       = damp(s.y,       targetY,       smoothing, dt);
-      s.s       = damp(s.s,       targetS,       smoothing, dt);
-      s.rx      = damp(s.rx,      targetRX,      smoothing, dt);
-      s.ry      = damp(s.ry,      targetRY,      smoothing, dt);
-      s.opacity = damp(s.opacity, targetOpacity, smoothing * 1.5, dt);
-    }
-
-    // Apply transforms
-    group.current.position.set(s.x, s.y, 0);
-    group.current.scale.setScalar(s.s);
-    group.current.rotation.x = s.rx;
-    group.current.rotation.y = s.ry;
-
-    // Apply opacity to all materials
-    materialRefs.current.forEach((mat) => {
-      mat.opacity = s.opacity;
-    });
   });
 
-  return <primitive ref={group} object={scene} />;
+  return (
+    <group ref={group}>
+      <Float speed={2} rotationIntensity={0.2} floatIntensity={0.8}>
+        <PresentationControls
+          enabled={isAtContact}
+          global={true} // Allow dragging anywhere on the canvas
+          cursor={true}
+          snap={{ mass: 3, tension: 400 }} // Smoothly snap back to center when released
+          speed={isMobile ? 5.0 : 1.5} // Massively increased speed for effortless mobile touch swiping
+          zoom={1}
+          rotation={[0, 0, 0]}
+          polar={[-Math.PI / 4, Math.PI / 4]} // Vertical limits
+          azimuth={[-Infinity, Infinity]} // Infinite horizontal rotation
+        >
+          <primitive object={scene} />
+          {/* Invisible Hitbox: Makes it super easy to grab the robot on touch screens without needing precise taps */}
+          <mesh visible={false}>
+            <boxGeometry args={[7, 10, 7]} />
+            <meshBasicMaterial transparent opacity={0} />
+          </mesh>
+        </PresentationControls>
+      </Float>
+    </group>
+  );
 }
 
-// (OrbitControls removed in favor of local rotation to avoid camera centering issues)
-
-// ─── Shared scroll ref (plain JS — works across React trees) ─────────────────
-// R3F Canvas creates a separate React tree, so we need a plain mutable object
-// that both the DOM component and the Canvas components can read from.
-
-const scrollRef = { current: 0 };
-
-function useWindowScroll() {
-  useEffect(() => {
-    function onScroll() {
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-      scrollRef.current = scrollHeight > 0
-        ? Math.min(Math.max(scrollTop / scrollHeight, 0), 1)
-        : 0;
-    }
-    onScroll(); // initial
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-}
-
-// A tiny wrapper so AnimatedModel can call scrollProgress.get()
-const scrollProgress = { get: () => scrollRef.current };
-
-// ─── Outer wrapper (provides Canvas + scroll binding) ─────────────────────────
+// ─── Outer wrapper ────────────────────────────────────────────────────────────
 
 export default function ScrollModel3D({ modelUrl = "/assets/asset3drobot.glb" }) {
-  useWindowScroll(); // start listening to scroll
-
-  const containerRef = useRef();
+  const [isMobile, setIsMobile] = useState(false);
   const [isAtContact, setIsAtContact] = useState(false);
-  const isAtContactRef = useRef(false);
+  
+  // framer-motion natively tracks window scroll here!
+  const { scrollYProgress } = useScroll();
 
-  // Drag-to-rotate state
-  const dragRotation = useRef({ x: 0, y: 0 });
-  const isDragging = useRef(false);
-  const previousPointer = useRef({ x: 0, y: 0 });
+  // Toggle pointer events only when reaching the bottom (Contact Section)
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    setIsAtContact(latest > 0.95);
+  });
 
-  // Handle dragging
+  // Handle responsive layout detection
   useEffect(() => {
-    function onPointerDown(e) {
-      if (!isAtContactRef.current) return;
-      isDragging.current = true;
-      previousPointer.current = { x: e.clientX, y: e.clientY };
-    }
-    function onPointerMove(e) {
-      if (!isDragging.current) return;
-      const deltaX = e.clientX - previousPointer.current.x;
-      const deltaY = e.clientY - previousPointer.current.y;
-      
-      dragRotation.current.y += deltaX * 0.01; // horizontal rotation
-      dragRotation.current.x += deltaY * 0.01; // vertical rotation
-      
-      previousPointer.current = { x: e.clientX, y: e.clientY };
-    }
-    function onPointerUp() {
-      isDragging.current = false;
-    }
-    window.addEventListener("pointerdown", onPointerDown);
-    window.addEventListener("pointermove", onPointerMove);
-    window.addEventListener("pointerup", onPointerUp);
-    return () => {
-      window.removeEventListener("pointerdown", onPointerDown);
-      window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("pointerup", onPointerUp);
-    };
-  }, []);
-
-  // Toggle pointer-events based on scroll position
-  useEffect(() => {
-    function onScroll() {
-      const shouldEnable = scrollRef.current > 0.85;
-      if (shouldEnable !== isAtContactRef.current) {
-        isAtContactRef.current = shouldEnable;
-        setIsAtContact(shouldEnable);
-      }
-    }
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile(); // initial check
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   return (
     <div
-      ref={containerRef}
       style={{
         position: "fixed",
         inset: 0,
         width: "100vw",
         height: "100vh",
+        // Only allow mouse interactions when at the contact section!
         pointerEvents: isAtContact ? "auto" : "none",
-        zIndex: 10,
+        // Render behind UI elements (z: 10) during scroll, but bring to front for interaction at the end
+        zIndex: isAtContact ? 50 : 0,
       }}
     >
       <Canvas
@@ -288,19 +133,22 @@ export default function ScrollModel3D({ modelUrl = "/assets/asset3drobot.glb" })
         gl={{ alpha: true, antialias: true }}
         style={{ background: "transparent" }}
       >
-        {/* Lighting */}
         <ambientLight intensity={0.7} />
         <directionalLight position={[5, 5, 5]} intensity={1.4} castShadow />
         <directionalLight position={[-4, -2, 4]} intensity={0.5} />
         <directionalLight position={[0, 3, -3]} intensity={0.3} />
 
         <Suspense fallback={null}>
-          <AnimatedModel url={modelUrl} scrollProgress={scrollProgress} dragRotation={dragRotation} />
+          <AnimatedModel 
+            url={modelUrl} 
+            scrollYProgress={scrollYProgress} 
+            isMobile={isMobile} 
+            isAtContact={isAtContact}
+          />
         </Suspense>
       </Canvas>
     </div>
   );
 }
 
-// Pre-load GLB so there's no flash
 useGLTF.preload("/assets/asset3drobot.glb");
