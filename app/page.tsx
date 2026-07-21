@@ -351,7 +351,7 @@ export default function Home() {
         {/* ══════════════════════════════════════════
             PROJECTS
         ══════════════════════════════════════════ */}
-        <section id="projects" className="section-shell py-24 px-4 md:px-8 max-w-5xl mx-auto">
+        <section id="projects" className="section-shell py-24 px-1 md:px-8 max-w-5xl mx-auto">
           <h2 className="font-heading text-3xl font-bold text-white mb-2">Projects</h2>
           <div className="w-16 h-1 rounded-full mb-12" style={{ background: "linear-gradient(90deg,#7c3aed,#06b6d4)" }} />
 
@@ -370,10 +370,10 @@ export default function Home() {
               {projects.map((p, i) => (
                 <ScrollStackItem 
                   key={p.title} 
-                  itemClassName="!p-0 flex flex-col md:flex-row !h-auto min-h-[380px] md:min-h-[350px] bg-[#0f0a19]/90 backdrop-blur-[12px] border border-white/10 rounded-[24px] md:rounded-[32px] overflow-hidden"
+                  itemClassName="!p-0 flex flex-col md:flex-row !h-auto min-h-[340px] md:min-h-[440px] bg-[#0f0a19]/90 backdrop-blur-[12px] border border-white/10 rounded-[16px] md:rounded-[40px] overflow-hidden"
                 >
                   {/* IMAGE */}
-                  <div className="w-full md:w-5/12 h-[180px] md:h-auto bg-white/5 relative flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10 overflow-hidden group/img">
+                  <div className="w-full md:w-6/12 h-[200px] md:h-auto bg-white/5 relative flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10 overflow-hidden group/img">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img 
                       src={p.image} 
@@ -386,11 +386,11 @@ export default function Home() {
                   </div>
 
                   {/* TEXT CONTENT */}
-                  <div className="p-5 md:p-8 flex-1 flex flex-col">
-                    <div className="text-3xl md:text-4xl mb-3 md:mb-5">{p.icon}</div>
-                    <h3 className="font-heading text-white font-bold text-lg md:text-2xl mb-1">{p.title}</h3>
-                    <p className="text-violet-400 text-[10px] md:text-xs mb-3 md:mb-4 font-semibold tracking-wider uppercase">{p.subtitle}</p>
-                    <p className="text-white/70 text-sm leading-relaxed flex-grow">{p.desc}</p>
+                  <div className="p-4 md:p-10 flex-1 flex flex-col">
+                    <div className="text-2xl md:text-5xl mb-2 md:mb-6">{p.icon}</div>
+                    <h3 className="font-heading text-white font-bold text-base md:text-3xl mb-1 md:mb-3">{p.title}</h3>
+                    <p className="text-violet-400 text-[10px] md:text-sm mb-2 md:mb-5 font-semibold tracking-wider uppercase">{p.subtitle}</p>
+                    <p className="text-white/70 text-xs md:text-sm leading-relaxed flex-grow">{p.desc}</p>
                     <div className="flex flex-wrap gap-2 md:gap-3 mt-4 md:mt-6">
                       {p.tags.map((t) => (
                         <span
@@ -453,16 +453,16 @@ export default function Home() {
 
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 {[
-                  { label: "Email",    value: "egasurya04@gmail.com",  href: "mailto:egasurya04@gmail.com",     icon: "✉️"  },
-                  { label: "GitHub",   value: "github.com/Egasuryaaa", href: "https://github.com/Egasuryaaa",   icon: "🐙"  },
-                  { label: "Phone",    value: "+62 822-5710-8680",      href: "https://wa.me/6282257108680?text=Halo%20Ega,%20saya%20tertarik%20dengan%20portfolio%20Anda!",     icon: "📞"  },
-                  { label: "Location", value: "Mojokerto, East Java",   href: null,                              icon: "📍"  },
+                  { label: "Email",     value: "egasurya04@gmail.com",  href: "mailto:egasurya04@gmail.com",     icon: "✉️"  },
+                  { label: "GitHub",    value: "github.com/Egasuryaaa", href: "https://github.com/Egasuryaaa",   icon: "🐙"  },
+                  { label: "WhatsApp",  value: "+62 822-5710-8680",      href: "https://wa.me/6282257108680?text=Halo%20Ega,%20saya%20tertarik%20dengan%20portfolio%20Anda!",     icon: "📞"  },
+                  { label: "Location",  value: "Mojokerto, East Java",   href: null,                              icon: "📍"  },
                 ].map(({ label, value, href, icon }) => (
                   <a
                     key={label}
                     href={href ?? undefined}
-                    target={href?.startsWith("http") ? "_blank" : undefined}
-                    rel="noreferrer"
+                    target={href ? "_blank" : undefined}
+                    rel="noopener noreferrer"
                     className={`relative z-20 flex flex-col gap-2 sm:gap-3 p-4 sm:p-5 rounded-2xl border border-white/10 transition-all duration-300
                       ${href ? "hover:border-violet-400/50 hover:-translate-y-1 cursor-pointer" : "cursor-default"}`}
                     style={{ background: "rgba(255,255,255,.03)", backdropFilter: "blur(8px)" }}

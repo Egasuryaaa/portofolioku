@@ -105,7 +105,8 @@ const ScrollStack = ({
       const scaleProgress = calculateProgress(scrollTop, triggerStart, triggerEnd);
       const targetScale = baseScale + i * itemScale;
       const scale = 1 - scaleProgress * (1 - targetScale);
-      const rotation = rotationAmount ? i * rotationAmount * scaleProgress : 0;
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+      const rotation = (rotationAmount && !isMobile) ? i * rotationAmount * scaleProgress : 0;
 
       let blur = 0;
       if (blurAmount) {
