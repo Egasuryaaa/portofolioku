@@ -6,7 +6,7 @@ import LiquidBackground from "@/components/LiquidBackground";
 import _RotatingText from "@/components/RotatingText";
 const RotatingText = _RotatingText as any;
 import ScrollVelocity from "@/components/ScrollVelocity";
-import ScrollReveal from "@/components/ScrollReveal";
+import ScrollFloat from "@/components/ScrollFloat";
 import GradualBlur from "@/components/GradualBlur";
 import ScrollStack, { ScrollStackItem } from "@/components/ScrollStack";
 import TextType from "@/components/TextType";
@@ -263,23 +263,20 @@ export default function Home() {
           <h2 className="font-heading text-3xl font-bold text-white mb-2">About Me</h2>
           <div className="w-16 h-1 rounded-full mb-10" style={{ background: "linear-gradient(90deg,#7c3aed,#06b6d4)" }} />
 
-          <div className="max-w-2xl">
+          <div className="max-w-3xl lg:max-w-5xl">
             {/* KUNCI: Jangan pakai scrollContainerRef di sini */}
             {/* Agar teks sesuai desain Anda, saya timpa styling default dari CSS bawaan dengan textClassName */}
-            <ScrollReveal 
-              baseOpacity={0}
-              enableBlur={true}
-              baseRotation={3}
-              blurStrength={10}
+            <ScrollFloat 
+              animationDuration={1}
+              ease="back.inOut(2)"
+              scrollStart="center bottom+=50%"
+              scrollEnd="bottom bottom-=40%"
+              stagger={0.03}
               containerClassName="m-0"
-              textClassName="text-white/60 text-xl md:text-2xl font-medium tracking-wide leading-relaxed"
-              rotationEnd="bottom 40%"
-              wordAnimationEnd="bottom 40%"
+              textClassName="text-white/60 text-2xl md:text-4xl lg:text-5xl font-semibold tracking-wide leading-relaxed text-justify"
             >
-              I&apos;m currently in Semester 6 of D3 Informatics Engineering (graduating 2026).
-              I love building clean scalable backend systems and exploring the full spectrum of
-              development from APIs to mobile apps.
-            </ScrollReveal>
+              I'm currently in Semester 6 of D3 Informatics Engineering (graduating 2026). I love building clean scalable backend systems and exploring the full spectrum of development from APIs to mobile apps.
+            </ScrollFloat>
           </div>
         </section>
 
@@ -390,7 +387,7 @@ export default function Home() {
                     <div className="text-2xl md:text-5xl mb-2 md:mb-6">{p.icon}</div>
                     <h3 className="font-heading text-white font-bold text-base md:text-3xl mb-1 md:mb-3">{p.title}</h3>
                     <p className="text-violet-400 text-[10px] md:text-sm mb-2 md:mb-5 font-semibold tracking-wider uppercase">{p.subtitle}</p>
-                    <p className="text-white/70 text-xs md:text-sm leading-relaxed flex-grow">{p.desc}</p>
+                    <p className="text-white/70 text-xs md:text-sm leading-relaxed flex-grow text-justify">{p.desc}</p>
                     <div className="flex flex-wrap gap-2 md:gap-3 mt-4 md:mt-6">
                       {p.tags.map((t) => (
                         <span
