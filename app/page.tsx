@@ -10,6 +10,7 @@ import ScrollFloat from "@/components/ScrollFloat";
 import GradualBlur from "@/components/GradualBlur";
 import ScrollStack, { ScrollStackItem } from "@/components/ScrollStack";
 import GradientText from "@/components/GradientText";
+import FadeContent from "@/components/FadeContent";
 import TextType from "@/components/TextType";
 
 // SSR: false untuk component yang pakai WebGL / window
@@ -137,7 +138,7 @@ export default function Home() {
                 showBorder={false}
                 className="text-xl md:text-2xl font-extrabold"
               >
-                Ga.Tech
+                Surya.Tech
               </GradientText>
             </span>
 
@@ -425,22 +426,24 @@ export default function Home() {
 
           <div className="columns-1 sm:columns-2 md:columns-3 gap-4 space-y-4">
             {[
-              { src: "/gallery/aplikasi Pengaduan Kominfo.png", caption: "Network Complaint System" },
-              { src: "/gallery/Aplikasi Rampungin.id.png", caption: "Daily Worker Finder"      },
-              { src: "/gallery/Website Iwakmart.png", caption: "IwakRejosari App"         },
-              { src: "/gallery/Website Formalfitku.png", caption: "Formalfitku E-Commerce"     },
-              { src: "/gallery/IOT Geofence Smart Tracker Backpack.png", caption: "IOT Geofence Backpack"        },
-            ].map((item) => (
-              <div key={item.src} className="gallery-item group relative overflow-hidden rounded-2xl break-inside-avoid cursor-pointer">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={item.src} alt={item.caption} className="w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4"
-                  style={{ background: "linear-gradient(to top,rgba(4,2,11,.9),transparent)" }}
-                >
-                  <p className="text-white font-medium text-sm">{item.caption}</p>
+              { src: "/gallery/galeri/WhatsApp Image 2025-09-15 at 17.58.20_fc91aebc.jpg", caption: "Gallery Image 1" },
+              { src: "/gallery/galeri/WhatsApp Image 2026-07-21 at 10.36.01.jpeg", caption: "Gallery Image 2" },
+              { src: "/gallery/galeri/WhatsApp Image 2026-07-21 at 10.36.43.jpeg", caption: "Gallery Image 3" },
+              { src: "/gallery/galeri/WhatsApp Image 2026-07-21 at 10.39.11.jpeg", caption: "Gallery Image 4" },
+              { src: "/gallery/galeri/WhatsApp Image 2026-07-21 at 12.12.14.jpeg", caption: "Gallery Image 5" },
+            ].map((item, idx) => (
+              <FadeContent blur={true} duration={2000} delay={idx * 300} key={item.src} className="break-inside-avoid">
+                <div className="gallery-item group relative overflow-hidden rounded-2xl cursor-pointer">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={item.src} alt={item.caption} className="w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4"
+                    style={{ background: "linear-gradient(to top,rgba(4,2,11,.9),transparent)" }}
+                  >
+                    <p className="text-white font-medium text-sm">{item.caption}</p>
+                  </div>
                 </div>
-              </div>
+              </FadeContent>
             ))}
           </div>
         </section>

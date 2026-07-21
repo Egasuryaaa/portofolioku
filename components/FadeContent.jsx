@@ -6,7 +6,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const FadeContent = ({
   children,
-  container,
+  container = null,
   blur = false,
   duration = 1000,
   ease = 'power2.out',
@@ -16,10 +16,10 @@ const FadeContent = ({
   disappearAfter = 0,
   disappearDuration = 0.5,
   disappearEase = 'power2.in',
-  onComplete,
-  onDisappearanceComplete,
+  onComplete = undefined,
+  onDisappearanceComplete = undefined,
   className = '',
-  style,
+  style = {},
   ...props
 }) => {
   const ref = useRef(null);
