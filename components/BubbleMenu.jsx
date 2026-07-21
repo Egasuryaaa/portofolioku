@@ -43,9 +43,9 @@ const DEFAULT_ITEMS = [
 
 export default function BubbleMenu({
   logo,
-  onMenuClick,
-  className,
-  style,
+  onMenuClick = undefined,
+  className = '',
+  style = {},
   menuAriaLabel = 'Toggle menu',
   menuBg = '#fff',
   menuContentColor = '#111',
@@ -184,6 +184,13 @@ export default function BubbleMenu({
                   href={item.href}
                   aria-label={item.ariaLabel || item.label}
                   className="pill-link"
+                  onClick={(e) => {
+                    if (item.href?.startsWith('#')) {
+                      e.preventDefault();
+                      document.querySelector(item.href)?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                    if (isMenuOpen) handleToggle();
+                  }}
                   style={{
                     '--item-rot': `${item.rotation ?? 0}deg`,
                     '--pill-bg': menuBg,

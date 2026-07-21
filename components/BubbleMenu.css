@@ -1,14 +1,21 @@
 .bubble-menu {
-  left: 0;
-  right: 0;
-  top: 2em;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 1em;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 0 2em;
+  padding: 0.5rem 1rem;
   pointer-events: none;
   z-index: 99;
+  /* Glass pill style */
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  width: calc(100% - 2rem);
+  max-width: 1024px;
 }
 
 .bubble-menu.fixed {
@@ -20,12 +27,12 @@
 }
 
 .bubble-menu .bubble {
-  --bubble-size: 48px;
+  --bubble-size: 38px;
   width: var(--bubble-size);
   height: var(--bubble-size);
   border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  background: transparent !important; /* override inline styles */
+  box-shadow: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -49,6 +56,7 @@
 .bubble-menu .toggle-bubble {
   width: var(--bubble-size);
   height: var(--bubble-size);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .bubble-menu .bubble-logo {
@@ -87,8 +95,8 @@
 }
 
 .bubble-menu .menu-line {
-  width: 26px;
-  height: 2px;
+  width: 24px;
+  height: 2.5px;
   background: #111;
   border-radius: 2px;
   display: block;
@@ -113,7 +121,7 @@
 
 @media (min-width: 768px) {
   .bubble-menu .bubble {
-    --bubble-size: 56px;
+    --bubble-size: 44px;
   }
 
   .bubble-menu .logo-bubble {

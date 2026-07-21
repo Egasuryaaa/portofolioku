@@ -11,6 +11,7 @@ import GradualBlur from "@/components/GradualBlur";
 import ScrollStack, { ScrollStackItem } from "@/components/ScrollStack";
 import GradientText from "@/components/GradientText";
 import FadeContent from "@/components/FadeContent";
+import BubbleMenu from "@/components/BubbleMenu";
 import TextType from "@/components/TextType";
 
 // SSR: false untuk component yang pakai WebGL / window
@@ -21,22 +22,22 @@ const ScrollModel3D = dynamic(() => import("@/components/ScrollModel3D"), { ssr:
 // ─── data ────────────────────────────────────────────────────────────────────
 
 const logos = [
-  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg",   alt: "Laravel"   },
-  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",  alt: "Node.js"   },
-  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg",alt: "Flutter"   },
-  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",    alt: "MySQL"     },
-  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",        alt: "Git"       },
-  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg",  alt: "GitHub", invert: true },
-  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg",    alt: "Figma"     },
-  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",    alt: "React"     },
-  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg",        alt: "PHP"       },
+  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg", alt: "Laravel" },
+  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg", alt: "Node.js" },
+  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg", alt: "Flutter" },
+  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg", alt: "MySQL" },
+  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg", alt: "Git" },
+  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg", alt: "GitHub", invert: true },
+  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg", alt: "Figma" },
+  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg", alt: "React" },
+  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg", alt: "PHP" },
 ];
 
 const skills: Record<string, string[]> = {
-  "Backend":             ["Laravel", "CodeIgniter", "Node.js", "MySQL", "PostgreSQL", "REST API"],
-  "Frontend & Mobile":   ["Flutter", "React", "Tailwind CSS", "Figma"],
-  "Hardware & IoT":      ["IoT", "Geofencing", "Microcontroller"],
-  "Tools":               ["Git", "Postman", "Mind Mapping"],
+  "Backend": ["Laravel", "CodeIgniter", "Node.js", "MySQL", "PostgreSQL", "REST API"],
+  "Frontend & Mobile": ["Flutter", "React", "Tailwind CSS", "Figma"],
+  "Hardware & IoT": ["IoT", "Geofencing", "Microcontroller"],
+  "Tools": ["Git", "Postman", "Mind Mapping"],
 };
 
 const projects = [
@@ -45,7 +46,7 @@ const projects = [
     title: "Network Complaint Management System",
     subtitle: "Kominfo Gunungkidul",
     desc: "Web-based app for submitting and tracking network complaints. Staff can report issues and monitor resolution in real time.",
-    tags: ["CodeIgniter", "PostgreSQL", "REST API","Flutter"],
+    tags: ["CodeIgniter", "PostgreSQL", "REST API", "Flutter"],
     image: "/gallery/aplikasi Pengaduan Kominfo.png",
     imageClass: "object-contain p-4 md:p-6",
   },
@@ -54,7 +55,7 @@ const projects = [
     title: "Daily Worker Finder App",
     subtitle: "Gunungkidul Regency",
     desc: "Platform connecting residents with local tradespeople. Features: worker listings, category search, direct contact.",
-    tags: ["Flutter","MySQL","REST API","CodeIgniter"],
+    tags: ["Flutter", "MySQL", "REST API", "CodeIgniter"],
     image: "/gallery/Aplikasi Rampungin.id.png",
     imageClass: "object-contain p-4 md:p-6",
   },
@@ -63,7 +64,7 @@ const projects = [
     title: "IwakRejosari",
     subtitle: "Aquaculture Marketplace App",
     desc: "Mobile app for fish pond owners to market products and connect with buyers. Booking, listings, and scheduling.",
-    tags: ["Flutter", "Laravel", "REST API","MySQL"],
+    tags: ["Flutter", "Laravel", "REST API", "MySQL"],
     image: "/gallery/Website Iwakmart.png",
     imageClass: "object-contain p-4 md:p-6",
   },
@@ -91,8 +92,8 @@ const navLinks = [
   { label: "Home", href: "#hero" },
   { label: "About", href: "#about" },
   { label: "Skills", href: "#skills" },
-  { label: "Projects", href: "#projects" },
   { label: "Experience", href: "#experience" },
+  { label: "Projects", href: "#projects" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -124,29 +125,32 @@ export default function Home() {
       {/* ── 3D SCROLL MODEL ── */}
       <ScrollModel3D />
 
-      {/* ── NAVBAR ── */}
-      <header className="fixed top-0 inset-x-0 z-50 flex justify-center px-2 pt-3">
-        <nav className="glass-nav w-full max-w-5xl rounded-full px-3 py-2 md:px-6">
-          <div className="no-scrollbar flex items-center gap-2 overflow-x-auto md:gap-6">
-            <span
-              className="shrink-0 cursor-pointer flex items-center"
-              onClick={() => document.querySelector("#hero")?.scrollIntoView({ behavior: "smooth" })}
+      {/* ── DESKTOP NAVBAR ── */}
+      <header className="hidden md:flex fixed top-0 inset-x-0 z-50 justify-center px-4 pt-4 pointer-events-none">
+        <nav
+          className="w-full max-w-5xl rounded-full px-6 py-3 pointer-events-auto flex items-center justify-between border border-white/10 shadow-lg"
+          style={{ background: "rgba(255, 255, 255, 0.05)", backdropFilter: "blur(10px)" }}
+        >
+          <span
+            className="shrink-0 cursor-pointer flex items-center"
+            onClick={() => document.querySelector("#hero")?.scrollIntoView({ behavior: "smooth" })}
+          >
+            <GradientText
+              colors={["#a78bfa", "#22d3ee", "#a78bfa", "#22d3ee", "#a78bfa"]}
+              animationSpeed={5}
+              showBorder={false}
+              className="text-xl md:text-2xl font-extrabold cursor-pointer"
             >
-              <GradientText
-                colors={["#a78bfa", "#22d3ee", "#a78bfa", "#22d3ee", "#a78bfa"]} // violet-400 to cyan-400 equivalent hex
-                animationSpeed={5}
-                showBorder={false}
-                className="text-xl md:text-2xl font-extrabold"
-              >
-                Surya.Tech
-              </GradientText>
-            </span>
+              Surya.Tech
+            </GradientText>
+          </span>
 
+          <div className="flex items-center gap-4 lg:gap-6">
             {navLinks.map((l) => (
               <button
                 key={l.href}
                 onClick={() => document.querySelector(l.href)?.scrollIntoView({ behavior: "smooth" })}
-                className="shrink-0 rounded-full border border-white/15 px-3 py-1 text-xs md:text-sm text-white/80 hover:border-violet-400/60 hover:text-white transition-colors"
+                className="shrink-0 rounded-full px-3 py-1.5 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors"
               >
                 {l.label}
               </button>
@@ -154,6 +158,36 @@ export default function Home() {
           </div>
         </nav>
       </header>
+
+      {/* ── MOBILE NAVBAR (BUBBLE MENU) ── */}
+      <div className="md:hidden">
+        <BubbleMenu
+          useFixedPosition={true}
+          menuBg="rgba(255, 255, 255, 0.6)"
+          menuContentColor="#ffffffff"
+          logo={
+            <span onClick={() => {
+              document.querySelector("#hero")?.scrollIntoView({ behavior: "smooth" });
+            }}>
+              <GradientText
+                colors={["#a78bfa", "#22d3ee", "#a78bfa", "#22d3ee", "#a78bfa"]}
+                animationSpeed={5}
+                showBorder={false}
+                className="text-xl font-extrabold cursor-pointer"
+              >
+                Surya.Tech
+              </GradientText>
+            </span>
+          }
+          items={navLinks.map((l, i) => ({
+            label: l.label,
+            href: l.href,
+            ariaLabel: l.label,
+            rotation: i % 2 === 0 ? 8 : -8,
+            hoverStyles: { bgColor: '#7c3aed', textColor: '#ffffff' }
+          }))}
+        />
+      </div>
 
       <main className="relative z-10">
 
@@ -173,7 +207,7 @@ export default function Home() {
 
               <div className="flex items-center gap-3 mb-6 text-xl md:text-2xl font-semibold">
                 <span className="text-white/40">I&apos;m a</span>
-                
+
                 <RotatingText
                   texts={[
                     "Frontend Developer",
@@ -194,7 +228,7 @@ export default function Home() {
                 />
               </div>
 
-              <TextType 
+              <TextType
                 as="p"
                 className="text-white/60 leading-relaxed mb-8 max-w-lg min-h-[120px] md:min-h-[84px]"
                 text="Motivated D3 Informatics Engineering student with hands-on experience building RESTful APIs, web applications, and mobile apps using Laravel, Node.js, and Flutter. Based in Mojokerto, East Java."
@@ -275,7 +309,7 @@ export default function Home() {
           <div className="max-w-3xl lg:max-w-5xl">
             {/* KUNCI: Jangan pakai scrollContainerRef di sini */}
             {/* Agar teks sesuai desain Anda, saya timpa styling default dari CSS bawaan dengan textClassName */}
-            <ScrollFloat 
+            <ScrollFloat
               animationDuration={1}
               ease="back.inOut(2)"
               scrollStart="center bottom+=50%"
@@ -371,23 +405,23 @@ export default function Home() {
               baseScale={0.85}
               rotationAmount={2}
               blurAmount={2}
-              onStackComplete={() => {}}
+              onStackComplete={() => { }}
             >
               {projects.map((p, i) => (
-                <ScrollStackItem 
-                  key={p.title} 
+                <ScrollStackItem
+                  key={p.title}
                   itemClassName="!p-0 flex flex-col md:flex-row !h-auto min-h-[340px] md:min-h-[440px] bg-[#0f0a19]/90 backdrop-blur-[12px] border border-white/10 rounded-[16px] md:rounded-[40px] overflow-hidden"
                 >
                   {/* IMAGE */}
                   <div className="w-full md:w-6/12 h-[200px] md:h-auto bg-white/5 relative flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10 overflow-hidden group/img">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img 
-                      src={p.image} 
-                      alt={p.title} 
+                    <img
+                      src={p.image}
+                      alt={p.title}
                       width={400}
                       height={300}
                       loading="lazy"
-                      className={`w-full h-full transition-transform duration-700 group-hover/img:scale-110 ${p.imageClass}`} 
+                      className={`w-full h-full transition-transform duration-700 group-hover/img:scale-110 ${p.imageClass}`}
                     />
                   </div>
 
@@ -418,7 +452,7 @@ export default function Home() {
         {/* ══════════════════════════════════════════
             GALLERY  (placeholder — ganti src setelah ada foto)
         ══════════════════════════════════════════ */}
-        <section id="gallery" className="section-shell py-24 px-4 md:px-8 max-w-5xl mx-auto relative">
+        <section id="gallery" className="section-shell py-24 px-4 md:px-8 max-w-5xl mx-auto relative pointer-events-auto">
           <GradualBlur position="bottom" height="6rem" zIndex={10} />
 
           <h2 className="font-heading text-3xl font-bold text-white mb-2">Gallery</h2>
@@ -426,11 +460,11 @@ export default function Home() {
 
           <div className="columns-1 sm:columns-2 md:columns-3 gap-4 space-y-4">
             {[
-              { src: "/gallery/galeri/WhatsApp Image 2025-09-15 at 17.58.20_fc91aebc.jpg", caption: "Gallery Image 1" },
-              { src: "/gallery/galeri/WhatsApp Image 2026-07-21 at 10.36.01.jpeg", caption: "Gallery Image 2" },
-              { src: "/gallery/galeri/WhatsApp Image 2026-07-21 at 10.36.43.jpeg", caption: "Gallery Image 3" },
-              { src: "/gallery/galeri/WhatsApp Image 2026-07-21 at 10.39.11.jpeg", caption: "Gallery Image 4" },
-              { src: "/gallery/galeri/WhatsApp Image 2026-07-21 at 12.12.14.jpeg", caption: "Gallery Image 5" },
+              { src: "/gallery/galeri/WhatsApp Image 2025-09-15 at 17.58.20_fc91aebc.jpg", caption: "Bimtek aplikasi DOPADU GK" },
+              { src: "/gallery/galeri/WhatsApp Image 2026-07-21 at 10.36.01.jpeg", caption: "Presentasi Bakcend API Aplikasi " },
+              { src: "/gallery/galeri/WhatsApp Image 2026-07-21 at 10.36.43.jpeg", caption: "Dokumentasi Internship" },
+              { src: "/gallery/galeri/WhatsApp Image 2026-07-21 at 10.39.11.jpeg", caption: "Dokumentasi Development Aplikasi" },
+              { src: "/gallery/galeri/WhatsApp Image 2026-07-21 at 12.12.14.jpeg", caption: "Sosialisasi dan Bimtek Aplikasi IwakRejosari" },
             ].map((item, idx) => (
               <FadeContent blur={true} duration={2000} delay={idx * 300} key={item.src} className="break-inside-avoid">
                 <div className="gallery-item group relative overflow-hidden rounded-2xl cursor-pointer">
@@ -451,20 +485,20 @@ export default function Home() {
         {/* ══════════════════════════════════════════
             CONTACT
         ══════════════════════════════════════════ */}
-        <section id="contact" className="section-shell py-24 px-4 md:px-8 max-w-5xl mx-auto">
+        <section id="contact" className="section-shell py-24 px-4 md:px-8 max-w-5xl mx-auto pointer-events-none">
           <div className="flex flex-col md:flex-row gap-12 items-start">
 
             {/* ── LEFT COLUMN: Title + Contact Cards ── */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 pointer-events-auto">
               <h2 className="font-heading text-3xl font-bold text-white mb-2">Contact</h2>
               <div className="w-16 h-1 rounded-full mb-12" style={{ background: "linear-gradient(90deg,#7c3aed,#06b6d4)" }} />
 
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 {[
-                  { label: "Email",     value: "egasurya04@gmail.com",  href: "mailto:egasurya04@gmail.com",     icon: "✉️"  },
-                  { label: "GitHub",    value: "github.com/Egasuryaaa", href: "https://github.com/Egasuryaaa",   icon: "🐙"  },
-                  { label: "WhatsApp",  value: "+62 822-5710-8680",      href: "https://wa.me/6282257108680?text=Halo%20Ega,%20saya%20tertarik%20dengan%20portfolio%20Anda!",     icon: "📞"  },
-                  { label: "Location",  value: "Mojokerto, East Java",   href: null,                              icon: "📍"  },
+                  { label: "Email", value: "egasurya04@gmail.com", href: "mailto:egasurya04@gmail.com", icon: "✉️" },
+                  { label: "GitHub", value: "github.com/Egasuryaaa", href: "https://github.com/Egasuryaaa", icon: "🐙" },
+                  { label: "WhatsApp", value: "+62 822-5710-8680", href: "https://wa.me/6282257108680?text=Halo%20Ega,%20saya%20tertarik%20dengan%20portfolio%20Anda!", icon: "📞" },
+                  { label: "Location", value: "Mojokerto, East Java", href: null, icon: "📍" },
                 ].map(({ label, value, href, icon }) => (
                   <a
                     key={label}
@@ -485,7 +519,7 @@ export default function Home() {
               </div>
 
               <p className="text-white/30 text-xs mt-6 md:hidden">↓ Scroll ke bawah untuk interaksi robot 3D</p>
-              
+
               {/* Spacer for robot landing zone on mobile */}
               <div className="h-[250px] md:hidden w-full relative flex items-center justify-center text-center">
                 <p className="text-white/10 text-xs font-medium tracking-widest uppercase select-none mx-auto">

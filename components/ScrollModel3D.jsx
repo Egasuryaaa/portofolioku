@@ -124,8 +124,7 @@ export default function ScrollModel3D({ modelUrl = "/assets/asset3drobot.glb" })
         height: "100vh",
         // Only allow mouse interactions when at the contact section!
         pointerEvents: isAtContact ? "auto" : "none",
-        // Render behind UI elements (z: 10) during scroll, but bring to front for interaction at the end
-        zIndex: isAtContact ? 50 : 0,
+        zIndex: 0,
       }}
     >
       <Canvas
