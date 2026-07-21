@@ -71,7 +71,7 @@ function AnimatedModel({ url, scrollYProgress, isMobile, isAtContact }) {
     <group ref={group}>
       <Float speed={2} rotationIntensity={0.2} floatIntensity={0.8}>
         <PresentationControls
-          enabled={isAtContact}
+          enabled={true}
           global={true} // Allow dragging anywhere on the canvas
           cursor={true}
           snap={{ mass: 3, tension: 400 }} // Smoothly snap back to center when released
@@ -83,9 +83,9 @@ function AnimatedModel({ url, scrollYProgress, isMobile, isAtContact }) {
         >
           <primitive object={scene} />
           {/* Invisible Hitbox: Makes it super easy to grab the robot on touch screens without needing precise taps */}
-          <mesh visible={false}>
+          <mesh>
             <boxGeometry args={[7, 10, 7]} />
-            <meshBasicMaterial transparent opacity={0} />
+            <meshBasicMaterial transparent opacity={0} depthWrite={false} />
           </mesh>
         </PresentationControls>
       </Float>
@@ -102,9 +102,9 @@ export default function ScrollModel3D({ modelUrl = "/assets/asset3drobot.glb" })
   // framer-motion natively tracks window scroll here!
   const { scrollYProgress } = useScroll();
 
-  // Toggle pointer events only when reaching the bottom (Contact Section)
+  // Toggle pointer events only when reaching the Contact section
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    setIsAtContact(latest > 0.95);
+    setIsAtContact(latest > 0.65);
   });
 
   // Handle responsive layout detection
@@ -122,7 +122,6 @@ export default function ScrollModel3D({ modelUrl = "/assets/asset3drobot.glb" })
         inset: 0,
         width: "100vw",
         height: "100vh",
-        // Only allow mouse interactions when at the contact section!
         pointerEvents: isAtContact ? "auto" : "none",
         zIndex: 0,
       }}
