@@ -5,8 +5,7 @@ import { useRef } from "react";
 import LiquidBackground from "@/components/LiquidBackground";
 import _RotatingText from "@/components/RotatingText";
 const RotatingText = _RotatingText as any;
-import _LogoLoop from "@/components/LogoLoop";
-const LogoLoop = _LogoLoop as any;
+import ScrollVelocity from "@/components/ScrollVelocity";
 import ScrollReveal from "@/components/ScrollReveal";
 import GradualBlur from "@/components/GradualBlur";
 import ScrollStack, { ScrollStackItem } from "@/components/ScrollStack";
@@ -25,15 +24,17 @@ const logos = [
   { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg",alt: "Flutter"   },
   { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",    alt: "MySQL"     },
   { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",        alt: "Git"       },
+  { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg",  alt: "GitHub", invert: true },
   { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg",    alt: "Figma"     },
   { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",    alt: "React"     },
   { src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg",        alt: "PHP"       },
 ];
 
 const skills: Record<string, string[]> = {
-  "Backend":             ["Laravel", "Node.js", "SQL", "REST API"],
-  "Mobile & Frontend":   ["Flutter", "Figma", "React"],
-  "Tools":               ["Git", "Mind Mapping", "Postman"],
+  "Backend":             ["Laravel", "CodeIgniter", "Node.js", "MySQL", "PostgreSQL", "REST API"],
+  "Frontend & Mobile":   ["Flutter", "React", "Tailwind CSS", "Figma"],
+  "Hardware & IoT":      ["IoT", "Geofencing", "Microcontroller"],
+  "Tools":               ["Git", "Postman", "Mind Mapping"],
 };
 
 const projects = [
@@ -42,21 +43,45 @@ const projects = [
     title: "Network Complaint Management System",
     subtitle: "Kominfo Gunungkidul",
     desc: "Web-based app for submitting and tracking network complaints. Staff can report issues and monitor resolution in real time.",
-    tags: ["Laravel", "SQL", "REST API"],
+    tags: ["CodeIgniter", "PostgreSQL", "REST API","Flutter"],
+    image: "/gallery/aplikasi Pengaduan Kominfo.png",
+    imageClass: "object-contain p-4 md:p-6",
   },
   {
     icon: "🔧",
     title: "Daily Worker Finder App",
     subtitle: "Gunungkidul Regency",
     desc: "Platform connecting residents with local tradespeople. Features: worker listings, category search, direct contact.",
-    tags: ["Flutter", "Node.js", "REST API"],
+    tags: ["Flutter","MySQL","REST API","CodeIgniter"],
+    image: "/gallery/Aplikasi Rampungin.id.png",
+    imageClass: "object-contain p-4 md:p-6",
   },
   {
     icon: "🐟",
     title: "IwakRejosari",
     subtitle: "Aquaculture Marketplace App",
     desc: "Mobile app for fish pond owners to market products and connect with buyers. Booking, listings, and scheduling.",
-    tags: ["Flutter", "Laravel", "REST API"],
+    tags: ["Flutter", "Laravel", "REST API","MySQL"],
+    image: "/gallery/Website Iwakmart.png",
+    imageClass: "object-contain p-4 md:p-6",
+  },
+  {
+    icon: "👔",
+    title: "Formalfitku",
+    subtitle: "E-Commerce Website",
+    desc: "A web platform for custom formal wear and clothing marketplace.",
+    tags: ["Laravel", "Tailwind CSS", "MySQL"],
+    image: "/gallery/Website Formalfitku.png",
+    imageClass: "object-contain p-4 md:p-6",
+  },
+  {
+    icon: "🎒",
+    title: "IOT Geofence Smart Tracker Backpack",
+    subtitle: "IoT Tracking System",
+    desc: "A smart backpack equipped with IoT geofencing technology to track location and ensure the security of belongings.",
+    tags: ["IoT", "Geofencing", "Hardware"],
+    image: "/gallery/IOT Geofence Smart Tracker Backpack.png",
+    imageClass: "object-contain p-4 md:p-6",
   },
 ];
 
@@ -199,13 +224,12 @@ export default function Home() {
             SCROLL VELOCITY DIVIDER  (pure CSS marquee)
         ══════════════════════════════════════════ */}
         <div className="section-shell border-y border-white/10 py-5 overflow-hidden my-8">
-          <div className="velocity-track flex gap-12 w-max" style={{ animationDuration: "18s" }}>
-            {[...Array(3)].map((_, i) => (
-              <span key={i} className="text-white/30 text-lg font-semibold tracking-widest whitespace-nowrap">
-                Laravel ✦ Node.js ✦ Flutter ✦ REST API ✦ SQL ✦ Git ✦ Figma ✦ React ✦&nbsp;
-              </span>
-            ))}
-          </div>
+          <ScrollVelocity
+            texts={(["Laravel ✦ CodeIgniter ✦ Flutter ✦ Tailwind CSS ✦ Node.js ✦ MySQL ✦ PostgreSQL ✦ REST API ✦ Git ✦ IoT ✦ Figma ✦ "] as any)}
+            velocity={50}
+            className="text-white/30 text-lg font-semibold tracking-widest px-4 shrink-0"
+            scrollerClassName="flex whitespace-nowrap items-center"
+          />
         </div>
 
         {/* ══════════════════════════════════════════
@@ -217,15 +241,18 @@ export default function Home() {
             style={{ background: "linear-gradient(to right,#04020b,transparent)" }} />
           <div className="absolute right-0 top-0 h-full w-20 z-10 pointer-events-none"
             style={{ background: "linear-gradient(to left,#04020b,transparent)" }} />
-          <LogoLoop
-            logos={logos}
-            speed={90}
-            direction="left"
-            logoHeight={36}
-            gap={40}
-            pauseOnHover
-            fadeOut
-            fadeOutColor="#04020b"
+          <ScrollVelocity
+            texts={([
+              <div key="logos" className="flex items-center gap-12 px-6 shrink-0">
+                {logos.map((logo, idx) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img key={idx} src={logo.src} alt={logo.alt} width={36} height={36} loading="lazy" className={`h-9 md:h-10 opacity-70 hover:opacity-100 transition-opacity shrink-0 ${logo.invert ? 'invert' : ''}`} />
+                ))}
+              </div>
+            ] as any)}
+            velocity={-40}
+            className="flex items-center shrink-0"
+            scrollerClassName="flex whitespace-nowrap items-center"
           />
         </div>
 
@@ -343,24 +370,32 @@ export default function Home() {
               {projects.map((p, i) => (
                 <ScrollStackItem 
                   key={p.title} 
-                  itemClassName="!p-0 flex flex-col md:flex-row !h-auto min-h-[450px] md:min-h-[400px] bg-[#0f0a19]/90 backdrop-blur-[12px] border border-white/10 rounded-[30px] md:rounded-[40px] overflow-hidden"
+                  itemClassName="!p-0 flex flex-col md:flex-row !h-auto min-h-[380px] md:min-h-[350px] bg-[#0f0a19]/90 backdrop-blur-[12px] border border-white/10 rounded-[24px] md:rounded-[32px] overflow-hidden"
                 >
-                  {/* IMAGE PLACEHOLDER */}
-                  <div className="w-full md:w-5/12 h-[220px] md:h-auto bg-white/5 relative flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10">
-                    <span className="text-white/20 text-sm font-medium tracking-widest uppercase">Insert Image Here</span>
+                  {/* IMAGE */}
+                  <div className="w-full md:w-5/12 h-[180px] md:h-auto bg-white/5 relative flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10 overflow-hidden group/img">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img 
+                      src={p.image} 
+                      alt={p.title} 
+                      width={400}
+                      height={300}
+                      loading="lazy"
+                      className={`w-full h-full transition-transform duration-700 group-hover/img:scale-110 ${p.imageClass}`} 
+                    />
                   </div>
 
                   {/* TEXT CONTENT */}
-                  <div className="p-6 md:p-10 flex-1 flex flex-col">
-                    <div className="text-4xl md:text-5xl mb-4 md:mb-6">{p.icon}</div>
-                    <h3 className="font-heading text-white font-bold text-xl md:text-3xl mb-2">{p.title}</h3>
-                    <p className="text-violet-400 text-xs md:text-sm mb-4 md:mb-5 font-semibold tracking-wider uppercase">{p.subtitle}</p>
-                    <p className="text-white/70 text-sm md:text-base leading-relaxed flex-grow">{p.desc}</p>
-                    <div className="flex flex-wrap gap-2 md:gap-3 mt-5 md:mt-8">
+                  <div className="p-5 md:p-8 flex-1 flex flex-col">
+                    <div className="text-3xl md:text-4xl mb-3 md:mb-5">{p.icon}</div>
+                    <h3 className="font-heading text-white font-bold text-lg md:text-2xl mb-1">{p.title}</h3>
+                    <p className="text-violet-400 text-[10px] md:text-xs mb-3 md:mb-4 font-semibold tracking-wider uppercase">{p.subtitle}</p>
+                    <p className="text-white/70 text-sm leading-relaxed flex-grow">{p.desc}</p>
+                    <div className="flex flex-wrap gap-2 md:gap-3 mt-4 md:mt-6">
                       {p.tags.map((t) => (
                         <span
                           key={t}
-                          className="text-[10px] md:text-xs px-3 py-1.5 rounded-lg text-cyan-300 border border-cyan-400/30 font-medium tracking-wide"
+                          className="text-[10px] px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-cyan-300 border border-cyan-400/30 font-medium tracking-wide"
                           style={{ background: "rgba(6,182,212,.1)" }}
                         >
                           {t}
@@ -385,12 +420,11 @@ export default function Home() {
 
           <div className="columns-1 sm:columns-2 md:columns-3 gap-4 space-y-4">
             {[
-              { src: "https://picsum.photos/seed/ga1/600/800", caption: "Network Complaint System" },
-              { src: "https://picsum.photos/seed/ga2/600/400", caption: "Daily Worker Finder"      },
-              { src: "https://picsum.photos/seed/ga3/600/700", caption: "IwakRejosari App"         },
-              { src: "https://picsum.photos/seed/ga4/600/500", caption: "Internship — Kominfo"     },
-              { src: "https://picsum.photos/seed/ga5/600/600", caption: "UI/UX Design Work"        },
-              { src: "https://picsum.photos/seed/ga6/600/450", caption: "Backend Development"      },
+              { src: "/gallery/aplikasi Pengaduan Kominfo.png", caption: "Network Complaint System" },
+              { src: "/gallery/Aplikasi Rampungin.id.png", caption: "Daily Worker Finder"      },
+              { src: "/gallery/Website Iwakmart.png", caption: "IwakRejosari App"         },
+              { src: "/gallery/Website Formalfitku.png", caption: "Formalfitku E-Commerce"     },
+              { src: "/gallery/IOT Geofence Smart Tracker Backpack.png", caption: "IOT Geofence Backpack"        },
             ].map((item) => (
               <div key={item.src} className="gallery-item group relative overflow-hidden rounded-2xl break-inside-avoid cursor-pointer">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
