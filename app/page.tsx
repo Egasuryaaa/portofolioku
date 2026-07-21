@@ -9,6 +9,7 @@ import ScrollVelocity from "@/components/ScrollVelocity";
 import ScrollFloat from "@/components/ScrollFloat";
 import GradualBlur from "@/components/GradualBlur";
 import ScrollStack, { ScrollStackItem } from "@/components/ScrollStack";
+import GradientText from "@/components/GradientText";
 import TextType from "@/components/TextType";
 
 // SSR: false untuk component yang pakai WebGL / window
@@ -68,7 +69,7 @@ const projects = [
   {
     icon: "👔",
     title: "Formalfitku",
-    subtitle: "E-Commerce Website",
+    subtitle: "Website",
     desc: "A web platform for custom formal wear and clothing marketplace.",
     tags: ["Laravel", "Tailwind CSS", "MySQL"],
     image: "/gallery/Website Formalfitku.png",
@@ -127,10 +128,17 @@ export default function Home() {
         <nav className="glass-nav w-full max-w-5xl rounded-full px-3 py-2 md:px-6">
           <div className="no-scrollbar flex items-center gap-2 overflow-x-auto md:gap-6">
             <span
-              className="shrink-0 text-lg font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent cursor-pointer"
+              className="shrink-0 cursor-pointer flex items-center"
               onClick={() => document.querySelector("#hero")?.scrollIntoView({ behavior: "smooth" })}
             >
-              Ga.Tech
+              <GradientText
+                colors={["#a78bfa", "#22d3ee", "#a78bfa", "#22d3ee", "#a78bfa"]} // violet-400 to cyan-400 equivalent hex
+                animationSpeed={5}
+                showBorder={false}
+                className="text-xl md:text-2xl font-extrabold"
+              >
+                Ga.Tech
+              </GradientText>
             </span>
 
             {navLinks.map((l) => (
