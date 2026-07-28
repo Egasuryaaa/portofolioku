@@ -14,6 +14,7 @@ import FadeContent from "@/components/FadeContent";
 import BubbleMenu from "@/components/BubbleMenu";
 import TextType from "@/components/TextType";
 import AnimatedContent from "@/components/AnimatedContent";
+import MorphTechLogo from "@/components/MorphTechLogo";
 
 // SSR: false untuk component yang pakai WebGL / window
 const LiquidEther = dynamic(() => import("@/components/LiquidEther"), { ssr: false });
@@ -136,14 +137,7 @@ export default function Home() {
             className="shrink-0 cursor-pointer flex items-center"
             onClick={() => document.querySelector("#hero")?.scrollIntoView({ behavior: "smooth" })}
           >
-            <GradientText
-              colors={["#a78bfa", "#22d3ee", "#a78bfa", "#22d3ee", "#a78bfa"]}
-              animationSpeed={5}
-              showBorder={false}
-              className="text-xl md:text-2xl font-extrabold cursor-pointer"
-            >
-              Surya.Tech
-            </GradientText>
+            <MorphTechLogo size="md" />
           </span>
 
           <div className="flex items-center gap-4 lg:gap-6">
@@ -170,14 +164,7 @@ export default function Home() {
             <span onClick={() => {
               document.querySelector("#hero")?.scrollIntoView({ behavior: "smooth" });
             }}>
-              <GradientText
-                colors={["#a78bfa", "#22d3ee", "#a78bfa", "#22d3ee", "#a78bfa"]}
-                animationSpeed={5}
-                showBorder={false}
-                className="text-xl font-extrabold cursor-pointer"
-              >
-                Surya.Tech
-              </GradientText>
+              <MorphTechLogo size="sm" />
             </span>
           }
           items={navLinks.map((l, i) => ({
