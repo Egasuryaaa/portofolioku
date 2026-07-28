@@ -8,7 +8,15 @@ import "./MorphTechLogo.css";
 export default function MorphTechLogo({ size = "md", className = "", onClick = undefined }) {
   const [isLogo, setIsLogo] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const isSmall = size === "sm";
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Dynamic timing: 4 detik saat menjadi tulisan (text), 2 detik saat menjadi ikon (logo)
   useEffect(() => {
@@ -41,9 +49,9 @@ export default function MorphTechLogo({ size = "md", className = "", onClick = u
             /* STATE 1: BRAND TEXT (Surya.Tech - Tampil 4 Detik) */
             <motion.div
               key="text-state"
-              initial={{ opacity: 0, scale: 0.5, filter: "blur(10px)" }}
+              initial={{ opacity: 0, scale: 0.5, filter: isMobile ? "blur(0px)" : "blur(10px)" }}
               animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-              exit={{ opacity: 0, scale: 0.4, filter: "blur(12px)" }}
+              exit={{ opacity: 0, scale: 0.4, filter: isMobile ? "blur(0px)" : "blur(12px)" }}
               transition={{ duration: 0.85, ease: "easeInOut" }}
               className="flex items-center justify-center w-full h-full"
             >
@@ -62,9 +70,9 @@ export default function MorphTechLogo({ size = "md", className = "", onClick = u
             /* STATE 2: TECHNOLOGY ICON (Bulat Sempurna - Tampil 2 Detik) */
             <motion.div
               key="logo-state"
-              initial={{ opacity: 0, scale: 2.0, filter: "blur(12px)", rotate: -180 }}
+              initial={{ opacity: 0, scale: 2.0, filter: isMobile ? "blur(0px)" : "blur(12px)", rotate: -180 }}
               animate={{ opacity: 1, scale: 1, filter: "blur(0px)", rotate: 0 }}
-              exit={{ opacity: 0, scale: 1.8, filter: "blur(10px)", rotate: 180 }}
+              exit={{ opacity: 0, scale: 1.8, filter: isMobile ? "blur(0px)" : "blur(10px)", rotate: 180 }}
               transition={{ duration: 0.85, ease: "easeInOut" }}
               className="flex items-center justify-center"
             >

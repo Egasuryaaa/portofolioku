@@ -17,15 +17,7 @@ function AnimatedModel({ url, scrollYProgress, isMobile, isAtContact }) {
     }
   }, [actions]);
 
-  // Ensure transparent materials
-  useEffect(() => {
-    scene.traverse((child) => {
-      if (child.isMesh && child.material) {
-        child.material = child.material.clone();
-        child.material.transparent = true;
-      }
-    });
-  }, [scene]);
+
 
   // ─── Keyframe Mapping (0, 0.33, 0.66, 1) ─────────────────────────────────
   // Based on user request:
@@ -107,9 +99,9 @@ export default function ScrollModel3D({ modelUrl = "/assets/asset3drobot.glb" })
     setIsAtContact(latest > 0.65);
   });
 
-  // Handle responsive layout detection
+  // Handle responsive layout detection (includes tablets and smartphones)
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
     checkMobile(); // initial check
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
@@ -128,11 +120,12 @@ export default function ScrollModel3D({ modelUrl = "/assets/asset3drobot.glb" })
     >
       <Canvas
         camera={{ position: [0, 0, 8], fov: 55 }}
-        gl={{ alpha: true, antialias: true }}
+        dpr={[1, isMobile ? 1.25 : 1.75]}
+        gl={{ alpha: true, antialias: !isMobile, powerPreference: "high-performance" }}
         style={{ background: "transparent" }}
       >
         <ambientLight intensity={0.7} />
-        <directionalLight position={[5, 5, 5]} intensity={1.4} castShadow />
+        <directionalLight position={[5, 5, 5]} intensity={1.4} />
         <directionalLight position={[-4, -2, 4]} intensity={0.5} />
         <directionalLight position={[0, 3, -3]} intensity={0.3} />
 

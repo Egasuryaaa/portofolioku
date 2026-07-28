@@ -120,7 +120,9 @@ export default function Home() {
           autoSpeed={0.4}
           autoIntensity={2.0}
           mouseForce={20}
-          resolution={0.5}
+          resolution={typeof window !== "undefined" && window.innerWidth < 1024 ? 0.35 : 0.5}
+          iterationsPoisson={typeof window !== "undefined" && window.innerWidth < 1024 ? 16 : 32}
+          iterationsViscous={typeof window !== "undefined" && window.innerWidth < 1024 ? 16 : 32}
         />
       </div>
 
@@ -415,7 +417,7 @@ export default function Home() {
               {projects.map((p, i) => (
                 <ScrollStackItem
                   key={p.title}
-                  itemClassName="!p-0 flex flex-col md:flex-row !h-auto min-h-[340px] md:min-h-[440px] bg-[#0f0a19]/90 backdrop-blur-[12px] border border-white/10 rounded-[16px] md:rounded-[40px] overflow-hidden"
+                  itemClassName="!p-0 flex flex-col md:flex-row !h-auto min-h-[340px] md:min-h-[440px] bg-[#0f0a19]/95 md:bg-[#0f0a19]/90 md:backdrop-blur-[12px] border border-white/10 rounded-[16px] md:rounded-[40px] overflow-hidden"
                 >
                   {/* IMAGE */}
                   <div className="w-full md:w-6/12 h-[200px] md:h-auto bg-white/5 relative flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10 overflow-hidden group/img">

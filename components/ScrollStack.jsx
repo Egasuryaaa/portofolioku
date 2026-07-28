@@ -105,11 +105,11 @@ const ScrollStack = ({
       const scaleProgress = calculateProgress(scrollTop, triggerStart, triggerEnd);
       const targetScale = baseScale + i * itemScale;
       const scale = 1 - scaleProgress * (1 - targetScale);
-      const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
       const rotation = (rotationAmount && !isMobile) ? i * rotationAmount * scaleProgress : 0;
 
       let blur = 0;
-      if (blurAmount) {
+      if (blurAmount && !isMobile) {
         let topCardIndex = 0;
         for (let j = 0; j < cardsRef.current.length; j++) {
           const jCardTop = getElementOffset(cardsRef.current[j]);
