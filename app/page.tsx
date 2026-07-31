@@ -126,6 +126,8 @@ export default function Home() {
         />
       </div>
 
+    {/* rollback performance */}
+
       {/* ── 3D SCROLL MODEL ── */}
       <ScrollModel3D />
 
