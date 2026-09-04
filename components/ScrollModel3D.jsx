@@ -1,10 +1,10 @@
 import { useRef, useEffect, useState, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useGLTF, useAnimations, Float, PresentationControls } from "@react-three/drei";
+import { useGLTF, useAnimations, Float, PresentationControls, PerformanceMonitor, AdaptiveDpr } from "@react-three/drei";
 import { useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import * as THREE from "three";
 
-function AnimatedModel({ url, scrollYProgress, isMobile, isAtContact }) {
+function AnimatedModel({ url, scrollYProgress, isMobile }) {
   const group = useRef();
   const { scene, animations } = useGLTF(url);
   const { actions } = useAnimations(animations, group);
@@ -17,40 +17,25 @@ function AnimatedModel({ url, scrollYProgress, isMobile, isAtContact }) {
     }
   }, [actions]);
 
-
-
   // ─── Keyframe Mapping (0, 0.33, 0.66, 1) ─────────────────────────────────
-  // Based on user request:
-  // 0.00: Hero (X: -2.5, Y: 1.5, Z: 0, ry: 0)
-  // 0.33: About/Skills (X: 4.0, Y: 0.5, Z: -1, ry: -0.5, rz: -0.1)
-  // 0.66: Projects/Gallery (X: 6.0, Y: 0, Z: 1, ry: 0.5, rz: -0.2)
-  // 1.00: Contact (X: 3.5, Y: -1.5, Z: 0, ry: 0, rz: 0)
-
-  // X Position
-  const xDesk = [-2.6, 4.0, 5.5, 2.8]; // Adjusted 2.8 for perfect symmetry in Contact column
+  const xDesk = [-2.6, 4.0, 5.5, 2.8];
   const xMob  = [1.2, -1.0, 1.2, 0];
   const x = useTransform(scrollYProgress, [0, 0.33, 0.66, 1], isMobile ? xMob : xDesk);
 
-  // Y Position
   const yDesk = [1.5, 0.5, 0, -1.5];
   const yMob  = [1.4, 2.0, 1.8, -2.0];
   const y = useTransform(scrollYProgress, [0, 0.33, 0.66, 1], isMobile ? yMob : yDesk);
 
-  // Z Position
   const zDesk = [0, -1, 1, 0];
   const z = useTransform(scrollYProgress, [0, 0.33, 0.66, 1], zDesk);
 
-  // Rotations
-  // A perfect 360-degree horizontal spin (Math.PI * 2) precisely completed when arriving at Contact
   const ry = useTransform(scrollYProgress, [0, 1], [0, Math.PI * 2]);
   const rz = useTransform(scrollYProgress, [0, 0.33, 0.66, 1], [0, -0.1, -0.2, 0]);
 
-  // Scale (Bigger at the end)
   const sDesk = [1.5, 1.2, 0.8, 2.5];
   const sMob  = [1.5, 1.2, 0.9, 2.4];
   const scale = useTransform(scrollYProgress, [0, 0.33, 0.66, 1], isMobile ? sMob : sDesk);
 
-  // Apply mapped Framer Motion values seamlessly into the 3D world per-frame
   useFrame(() => {
     if (group.current) {
       group.current.position.set(x.get(), y.get(), z.get());
@@ -64,17 +49,17 @@ function AnimatedModel({ url, scrollYProgress, isMobile, isAtContact }) {
       <Float speed={2} rotationIntensity={0.2} floatIntensity={0.8}>
         <PresentationControls
           enabled={true}
-          global={true} // Allow dragging anywhere on the canvas
+          global={true}
           cursor={true}
-          snap={{ mass: 3, tension: 400 }} // Smoothly snap back to center when released
-          speed={isMobile ? 5.0 : 1.5} // Massively increased speed for effortless mobile touch swiping
+          snap={{ mass: 3, tension: 400 }}
+          speed={isMobile ? 5.0 : 1.5}
           zoom={1}
           rotation={[0, 0, 0]}
-          polar={[-Math.PI / 4, Math.PI / 4]} // Vertical limits
-          azimuth={[-Infinity, Infinity]} // Infinite horizontal rotation
+          polar={[-Math.PI / 4, Math.PI / 4]}
+          azimuth={[-Infinity, Infinity]}
         >
           <primitive object={scene} />
-          {/* Invisible Hitbox: Makes it super easy to grab the robot on touch screens without needing precise taps */}
+          {/* Invisible Hitbox for easy touch interaction */}
           <mesh>
             <boxGeometry args={[7, 10, 7]} />
             <meshBasicMaterial transparent opacity={0} depthWrite={false} />
@@ -90,20 +75,24 @@ function AnimatedModel({ url, scrollYProgress, isMobile, isAtContact }) {
 export default function ScrollModel3D({ modelUrl = "/assets/asset3drobot.glb" }) {
   const [isMobile, setIsMobile] = useState(false);
   const [isAtContact, setIsAtContact] = useState(false);
-  
-  // framer-motion natively tracks window scroll here!
+  // DPR range: managed reactively so PerformanceMonitor can adjust at runtime
+  const [dpr, setDpr] = useState([1, 1.25]);
+
   const { scrollYProgress } = useScroll();
 
-  // Toggle pointer events only when reaching the Contact section
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     setIsAtContact(latest > 0.65);
   });
 
-  // Handle responsive layout detection (includes tablets and smartphones)
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
-    checkMobile(); // initial check
-    window.addEventListener("resize", checkMobile);
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      // Give mobile a ceiling of 1.5, desktop 1.75 — PerformanceMonitor can lower further
+      setDpr([1, mobile ? 1.5 : 1.75]);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile, { passive: true });
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
@@ -112,7 +101,7 @@ export default function ScrollModel3D({ modelUrl = "/assets/asset3drobot.glb" })
       style={{
         position: "fixed",
         inset: 0,
-        width: "100vw",
+        width: "100%",
         height: "100vh",
         pointerEvents: isAtContact ? "auto" : "none",
         zIndex: 0,
@@ -120,23 +109,37 @@ export default function ScrollModel3D({ modelUrl = "/assets/asset3drobot.glb" })
     >
       <Canvas
         camera={{ position: [0, 0, 8], fov: 55 }}
-        dpr={[1, isMobile ? 1.25 : 1.75]}
+        dpr={dpr}
         gl={{ alpha: true, antialias: !isMobile, powerPreference: "high-performance" }}
         style={{ background: "transparent" }}
       >
-        <ambientLight intensity={0.7} />
-        <directionalLight position={[5, 5, 5]} intensity={1.4} />
-        <directionalLight position={[-4, -2, 4]} intensity={0.5} />
-        <directionalLight position={[0, 3, -3]} intensity={0.3} />
+        {/*
+          PerformanceMonitor: watches FPS budget.
+          - onDecline: FPS drops below threshold → clamp DPR to 1x (biggest GPU relief)
+          - onIncline: FPS recovers → restore to device-appropriate max DPR
+          - flipflops: stops oscillating after 3 cycles (prevents yo-yo effect)
+        */}
+        <PerformanceMonitor
+          onDecline={() => setDpr([1, 1])}
+          onIncline={() => setDpr([1, isMobile ? 1.5 : 1.75])}
+          flipflops={3}
+          threshold={0.9}
+        >
+          <AdaptiveDpr pixelated />
 
-        <Suspense fallback={null}>
-          <AnimatedModel 
-            url={modelUrl} 
-            scrollYProgress={scrollYProgress} 
-            isMobile={isMobile} 
-            isAtContact={isAtContact}
-          />
-        </Suspense>
+          <ambientLight intensity={0.7} />
+          <directionalLight position={[5, 5, 5]} intensity={1.4} />
+          <directionalLight position={[-4, -2, 4]} intensity={0.5} />
+          <directionalLight position={[0, 3, -3]} intensity={0.3} />
+
+          <Suspense fallback={null}>
+            <AnimatedModel
+              url={modelUrl}
+              scrollYProgress={scrollYProgress}
+              isMobile={isMobile}
+            />
+          </Suspense>
+        </PerformanceMonitor>
       </Canvas>
     </div>
   );

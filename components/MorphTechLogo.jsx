@@ -35,12 +35,11 @@ export default function MorphTechLogo({ size = "md", className = "", onClick = u
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`morph-logo-container group relative flex items-center justify-center select-none cursor-pointer overflow-visible ${
-        isSmall ? "w-[125px] h-8" : "w-[155px] md:w-[170px] h-10 md:h-11"
-      } ${className}`}
+      className={`morph-logo-container group relative flex items-center justify-center select-none cursor-pointer overflow-visible ${isSmall ? "w-[125px] h-8" : "w-[155px] md:w-[170px] h-10 md:h-11"
+        } ${className}`}
     >
-      {/* Ambient background glow */}
-      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-violet-600/20 via-fuchsia-500/10 to-cyan-500/20 blur-md opacity-60 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      {/* Ambient background glow — secondary accent, very subtle */}
+      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-700/15 via-blue-500/8 to-sky-400/15 blur-md opacity-60 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
       {/* ── Content Switcher (Text <-> Logo) dengan animasi Ease In Out yang sangat halus ── */}
       <div className="relative w-full h-full flex items-center justify-center z-10">
@@ -56,12 +55,11 @@ export default function MorphTechLogo({ size = "md", className = "", onClick = u
               className="flex items-center justify-center w-full h-full"
             >
               <GradientText
-                colors={["#a78bfa", "#22d3ee", "#a78bfa", "#22d3ee", "#a78bfa"]}
+                colors={["#2563EB", "#38BDF8", "#2563EB", "#60A5FA", "#2563EB"]}
                 animationSpeed={5}
                 showBorder={false}
-                className={`font-extrabold tracking-tight whitespace-nowrap transition-all duration-300 group-hover:drop-shadow-[0_0_14px_rgba(167,139,250,0.85)] ${
-                  isSmall ? "text-base md:text-lg" : "text-xl md:text-2xl"
-                }`}
+                className={`font-extrabold tracking-tight whitespace-nowrap transition-all duration-300 group-hover:drop-shadow-[0_0_14px_rgba(37,99,235,0.8)] ${isSmall ? "text-base md:text-lg" : "text-xl md:text-2xl"
+                  }`}
               >
                 Surya.Tech
               </GradientText>
@@ -76,20 +74,18 @@ export default function MorphTechLogo({ size = "md", className = "", onClick = u
               transition={{ duration: 0.85, ease: "easeInOut" }}
               className="flex items-center justify-center"
             >
-              {/* Container BULAT (round circle 1:1 ratio) dengan gradasi ungu ke cyan */}
+              {/* Icon circle — primary accent gradient */}
               <div
-                className={`relative flex items-center justify-center rounded-full bg-gradient-to-tr from-[#7c3aed] via-[#8b5cf6] to-[#06b6d4] shadow-[0_0_16px_rgba(124,58,237,0.7)] group-hover:shadow-[0_0_24px_rgba(6,182,212,0.9)] transition-all duration-500 ${
-                  isSmall ? "w-8 h-8" : "w-10 h-10 md:w-11 md:h-11"
-                }`}
+                className={`relative flex items-center justify-center rounded-full bg-gradient-to-tr from-[#1D4ED8] via-[#2563EB] to-[#38BDF8] shadow-[0_0_16px_rgba(37,99,235,0.6)] group-hover:shadow-[0_0_24px_rgba(56,189,248,0.8)] transition-all duration-500 ${isSmall ? "w-8 h-8" : "w-10 h-10 md:w-11 md:h-11"
+                  }`}
               >
                 {/* Technology Icon Asset */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/assets/technology.png"
                   alt="Surya Tech Icon"
-                  className={`object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] group-hover:scale-115 group-hover:rotate-180 transition-all duration-700 ${
-                    isSmall ? "w-5 h-5" : "w-6 h-6 md:w-7 md:h-7"
-                  }`}
+                  className={`object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] group-hover:scale-115 group-hover:rotate-180 transition-all duration-700 ${isSmall ? "w-5 h-5" : "w-6 h-6 md:w-7 md:h-7"
+                    }`}
                 />
               </div>
             </motion.div>

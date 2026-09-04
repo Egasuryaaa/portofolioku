@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import LiquidBackground from "@/components/LiquidBackground";
 import _RotatingText from "@/components/RotatingText";
 const RotatingText = _RotatingText as any;
@@ -104,29 +104,39 @@ const navLinks = [
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // SSR-safe mobile detection — never reads window during server render
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 1024);
+    check();
+    window.addEventListener("resize", check, { passive: true });
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   return (
     <div
       ref={containerRef}
-      className="relative isolate min-h-screen overflow-x-clip text-slate-100"
-      style={{ backgroundColor: "#04020b" }}
+      className="relative isolate min-h-screen w-full max-w-[100vw] overflow-x-hidden text-slate-100"
+      style={{ backgroundColor: "#0A0E17" }}
     >
       {/* ── BACKGROUND ── */}
-      <LiquidBackground />                        {/* CSS orb fallback (always visible) */}
-      <div className="fixed inset-0 -z-10">       {/* WebGL liquid — loads after hydration */}
+      <LiquidBackground />
+      <div className="fixed inset-0 -z-10">
         <LiquidEther
-          colors={["#5227FF", "#7c3aed", "#06b6d4"]}
+          colors={["#0D1E3B", "#2563EB", "#38BDF8"]}
           style={{ width: "100%", height: "100%" }}
           autoDemo
-          autoSpeed={0.4}
-          autoIntensity={2.0}
-          mouseForce={20}
-          resolution={typeof window !== "undefined" && window.innerWidth < 1024 ? 0.35 : 0.5}
-          iterationsPoisson={typeof window !== "undefined" && window.innerWidth < 1024 ? 16 : 32}
-          iterationsViscous={typeof window !== "undefined" && window.innerWidth < 1024 ? 16 : 32}
+          autoSpeed={isMobile ? 0.15 : 0.4}
+          autoIntensity={isMobile ? 0.8 : 2.0}
+          mouseForce={isMobile ? 6 : 20}
+          resolution={isMobile ? 0.28 : 0.45}
+          iterationsPoisson={isMobile ? 8 : 28}
+          iterationsViscous={isMobile ? 8 : 28}
+          dt={isMobile ? 0.02 : 0.014}
         />
       </div>
 
-    {/* rollback performance */}
+      {/* rollback performance */}
 
       {/* ── 3D SCROLL MODEL ── */}
       <ScrollModel3D />
@@ -176,7 +186,7 @@ export default function Home() {
             href: l.href,
             ariaLabel: l.label,
             rotation: i % 2 === 0 ? 8 : -8,
-            hoverStyles: { bgColor: '#7c3aed', textColor: '#ffffff' }
+            hoverStyles: { bgColor: '#2563EB', textColor: '#ffffff' }
           }))}
         />
       </div>
@@ -208,7 +218,7 @@ export default function Home() {
                     "Laravel Enthusiast",
                     "Node.js Developer",
                   ]}
-                  mainClassName="text-violet-400 overflow-hidden" /* Warna Ungu */
+                  mainClassName="text-blue-400 overflow-hidden"
                   staggerFrom="last"
                   initial={{ y: "100%" }}
                   animate={{ y: 0 }}
@@ -234,13 +244,13 @@ export default function Home() {
                   href="/cv.pdf"
                   download
                   className="px-6 py-3 rounded-xl font-semibold text-white hover:scale-105 transition-transform"
-                  style={{ background: "linear-gradient(135deg,#7c3aed,#06b6d4)", boxShadow: "0 0 20px rgba(124,58,237,.4)" }}
+                  style={{ background: "linear-gradient(135deg,#1D4ED8,#2563EB)", boxShadow: "0 0 20px rgba(37,99,235,.35)" }}
                 >
                   Download CV
                 </a>
                 <button
                   onClick={() => document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" })}
-                  className="px-6 py-3 rounded-xl font-semibold text-white/80 border border-white/20 hover:border-violet-400 hover:text-white hover:scale-105 transition-all"
+                  className="px-6 py-3 rounded-xl font-semibold text-white/80 border border-white/20 hover:border-blue-400 hover:text-white hover:scale-105 transition-all"
                   style={{ backdropFilter: "blur(8px)", background: "rgba(255,255,255,.05)" }}
                 >
                   Contact Me
@@ -273,9 +283,9 @@ export default function Home() {
         <div className="section-shell py-6 relative overflow-hidden pointer-events-auto">
           {/* fade edges */}
           <div className="absolute left-0 top-0 h-full w-20 z-10 pointer-events-none"
-            style={{ background: "linear-gradient(to right,#04020b,transparent)" }} />
+            style={{ background: "linear-gradient(to right,#0A0E17,transparent)" }} />
           <div className="absolute right-0 top-0 h-full w-20 z-10 pointer-events-none"
-            style={{ background: "linear-gradient(to left,#04020b,transparent)" }} />
+            style={{ background: "linear-gradient(to left,#0A0E17,transparent)" }} />
           <ScrollVelocity
             texts={([
               <div key="logos" className="flex items-center gap-12 px-6 shrink-0">
@@ -296,7 +306,7 @@ export default function Home() {
         ══════════════════════════════════════════ */}
         <section id="about" className="section-shell py-24 px-4 md:px-8 max-w-5xl mx-auto pointer-events-auto">
           <h2 className="font-heading text-3xl font-bold text-white mb-2">About Me</h2>
-          <div className="w-16 h-1 rounded-full mb-10" style={{ background: "linear-gradient(90deg,#7c3aed,#06b6d4)" }} />
+          <div className="w-8 h-px mb-10" style={{ background: "rgba(37,99,235,0.5)" }} />
 
           <div className="max-w-3xl lg:max-w-5xl">
             {/* KUNCI: Jangan pakai scrollContainerRef di sini */}
@@ -320,38 +330,21 @@ export default function Home() {
         ══════════════════════════════════════════ */}
         <section id="skills" className="section-shell py-24 px-4 md:px-8 max-w-5xl mx-auto pointer-events-auto">
           <h2 className="font-heading text-3xl font-bold text-white mb-2">Skills</h2>
-          <div className="w-16 h-1 rounded-full mb-10" style={{ background: "linear-gradient(90deg,#7c3aed,#06b6d4)" }} />
+          <div className="w-8 h-px mb-10" style={{ background: "rgba(37,99,235,0.5)" }} />
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
-            {Object.entries(skills).map(([cat, items], catIdx) => (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10 items-start">
+            {Object.entries(skills).map(([cat, items]) => (
               <div key={cat}>
-                <p className="text-white/40 text-xs uppercase tracking-widest mb-3">{cat}</p>
+                <p className="font-mono text-[11px] text-white/30 mb-3 tracking-normal">{cat}</p>
                 <div className="flex flex-wrap gap-2">
-                  {items.map((s, itemIdx) => (
-                    <AnimatedContent
+                  {items.map((s) => (
+                    <span
                       key={s}
-                      distance={40}
-                      direction="vertical"
-                      reverse={false}
-                      duration={1.5}
-                      ease="back.out(1.5)"
-                      initialOpacity={0}
-                      animateOpacity={true}
-                      scale={0.8}
-                      threshold={0.2} // 1-0.2 = 80% from top (trigger lebih cepat)
-                      delay={(catIdx * 0.1) + (itemIdx * 0.05)}
-                      className="inline-block"
-                      container={undefined}
-                      onComplete={undefined}
-                      onDisappearanceComplete={undefined}
+                      className="px-3 py-1 rounded text-sm font-medium text-white/70 border border-white/10 hover:border-blue-400/40 hover:text-white transition-colors cursor-default"
+                      style={{ background: "rgba(37,99,235,0.06)" }}
                     >
-                      <span
-                        className="px-3 py-1 rounded-full text-sm font-medium text-white/80 border border-white/10 hover:border-violet-400/60 hover:text-white transition-all cursor-default block"
-                        style={{ background: "rgba(124,58,237,.1)" }}
-                      >
-                        {s}
-                      </span>
-                    </AnimatedContent>
+                      {s}
+                    </span>
                   ))}
                 </div>
               </div>
@@ -364,23 +357,22 @@ export default function Home() {
         ══════════════════════════════════════════ */}
         <section id="experience" className="section-shell py-24 px-4 md:px-8 max-w-5xl mx-auto pointer-events-auto">
           <h2 className="font-heading text-3xl font-bold text-white mb-2">Experience</h2>
-          <div className="w-16 h-1 rounded-full mb-12" style={{ background: "linear-gradient(90deg,#7c3aed,#06b6d4)" }} />
+          <div className="w-8 h-px mb-12" style={{ background: "rgba(37,99,235,0.5)" }} />
 
-          <div className="relative border-l-2 border-violet-500/30 pl-8 ml-4">
+          <div className="relative border-l border-blue-500/20 pl-8 ml-4">
             <div
-              className="absolute -left-[9px] top-2 w-4 h-4 rounded-full border-2 border-violet-500"
-              style={{ background: "#04020b" }}
+              className="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-blue-500/60"
             />
             <div
-              className="rounded-2xl p-6 border border-white/10 hover:border-violet-400/30 transition-all"
-              style={{ background: "rgba(255,255,255,.03)", backdropFilter: "blur(8px)" }}
+              className="rounded-xl p-6 border border-white/8 hover:border-blue-400/20 transition-all"
+              style={{ background: "rgba(19,27,46,0.7)", backdropFilter: "blur(8px)" }}
             >
               <div className="flex flex-wrap gap-3 items-start justify-between mb-4">
                 <div>
                   <h3 className="font-heading text-white font-semibold text-lg">IT Intern</h3>
-                  <p className="text-violet-400 text-sm">Diskominfo Gunungkidul</p>
+                  <p className="text-blue-400/80 text-sm">Diskominfo Gunungkidul</p>
                 </div>
-                <span className="text-xs px-3 py-1 rounded-full border border-white/10 text-white/50">2025 · Internship</span>
+                <span className="text-xs px-2.5 py-1 rounded border border-white/10 text-white/40 font-mono">2025</span>
               </div>
               <ul className="space-y-2">
                 {[
@@ -388,8 +380,8 @@ export default function Home() {
                   "Supported internal teams with network monitoring and technical troubleshooting.",
                   "Developed a complaint management system for network issues used within Kominfo.",
                 ].map((pt, i) => (
-                  <li key={i} className="text-white/60 text-sm flex gap-2">
-                    <span className="text-violet-400 mt-0.5 shrink-0">▹</span>{pt}
+                  <li key={i} className="text-white/55 text-sm flex gap-2">
+                    <span className="text-blue-400/60 mt-0.5 shrink-0">–</span>{pt}
                   </li>
                 ))}
               </ul>
@@ -402,7 +394,7 @@ export default function Home() {
         ══════════════════════════════════════════ */}
         <section id="projects" className="section-shell py-24 px-1 md:px-8 max-w-5xl mx-auto pointer-events-auto">
           <h2 className="font-heading text-3xl font-bold text-white mb-2">Projects</h2>
-          <div className="w-16 h-1 rounded-full mb-12" style={{ background: "linear-gradient(90deg,#7c3aed,#06b6d4)" }} />
+          <div className="w-8 h-px mb-12" style={{ background: "rgba(124,58,237,0.5)" }} />
 
           <div className="w-full">
             <ScrollStack
@@ -419,7 +411,7 @@ export default function Home() {
               {projects.map((p, i) => (
                 <ScrollStackItem
                   key={p.title}
-                  itemClassName="!p-0 flex flex-col md:flex-row !h-auto min-h-[340px] md:min-h-[440px] bg-[#0f0a19]/95 md:bg-[#0f0a19]/90 md:backdrop-blur-[12px] border border-white/10 rounded-[16px] md:rounded-[40px] overflow-hidden"
+                  itemClassName="!p-0 flex flex-col md:flex-row !h-auto min-h-[340px] md:min-h-[440px] bg-[#131B2E]/95 md:bg-[#131B2E]/90 md:backdrop-blur-[12px] border border-white/10 rounded-[16px] md:rounded-[40px] overflow-hidden"
                 >
                   {/* IMAGE */}
                   <div className="w-full md:w-6/12 h-[200px] md:h-auto bg-white/5 relative flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10 overflow-hidden group/img">
@@ -438,14 +430,14 @@ export default function Home() {
                   <div className="p-4 md:p-10 flex-1 flex flex-col">
                     <div className="text-2xl md:text-5xl mb-2 md:mb-6">{p.icon}</div>
                     <h3 className="font-heading text-white font-bold text-base md:text-3xl mb-1 md:mb-3">{p.title}</h3>
-                    <p className="text-violet-400 text-[10px] md:text-sm mb-2 md:mb-5 font-semibold tracking-wider uppercase">{p.subtitle}</p>
+                    <p className="font-mono text-[10px] md:text-xs text-sky-400/70 mb-2 md:mb-5 tracking-wide">{p.subtitle}</p>
                     <p className="text-white/70 text-xs md:text-sm leading-relaxed flex-grow text-justify">{p.desc}</p>
                     <div className="flex flex-wrap gap-2 md:gap-3 mt-4 md:mt-6">
                       {p.tags.map((t) => (
                         <span
                           key={t}
-                          className="text-[10px] px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-cyan-300 border border-cyan-400/30 font-medium tracking-wide"
-                          style={{ background: "rgba(6,182,212,.1)" }}
+                          className="text-[10px] px-2 py-1 md:px-3 md:py-1.5 rounded text-sky-300/80 border border-sky-400/20 font-mono tracking-wide"
+                          style={{ background: "rgba(56,189,248,.06)" }}
                         >
                           {t}
                         </span>
@@ -465,7 +457,7 @@ export default function Home() {
           <GradualBlur position="bottom" height="6rem" zIndex={10} />
 
           <h2 className="font-heading text-3xl font-bold text-white mb-2">Gallery</h2>
-          <div className="w-16 h-1 rounded-full mb-12" style={{ background: "linear-gradient(90deg,#7c3aed,#06b6d4)" }} />
+          <div className="w-8 h-px mb-12" style={{ background: "rgba(37,99,235,0.5)" }} />
 
           <div className="columns-1 sm:columns-2 md:columns-3 gap-4 space-y-4">
             {[
@@ -481,7 +473,7 @@ export default function Home() {
                   <img src={item.src} alt={item.caption} className="w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   <div
                     className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4"
-                    style={{ background: "linear-gradient(to top,rgba(4,2,11,.9),transparent)" }}
+                    style={{ background: "linear-gradient(to top,rgba(10,14,23,.9),transparent)" }}
                   >
                     <p className="text-white font-medium text-sm">{item.caption}</p>
                   </div>
@@ -501,7 +493,7 @@ export default function Home() {
             <div className="flex-1 min-w-0">
               <div className="pointer-events-auto">
                 <h2 className="font-heading text-3xl font-bold text-white mb-2">Contact</h2>
-                <div className="w-16 h-1 rounded-full mb-12" style={{ background: "linear-gradient(90deg,#7c3aed,#06b6d4)" }} />
+                <div className="w-8 h-px mb-12" style={{ background: "rgba(37,99,235,0.5)" }} />
 
                 <div className="grid grid-cols-2 gap-3 sm:gap-4">
                   {[
@@ -516,8 +508,8 @@ export default function Home() {
                       target={href ? "_blank" : undefined}
                       rel="noopener noreferrer"
                       className={`relative z-20 flex flex-col gap-2 sm:gap-3 p-4 sm:p-5 rounded-2xl border border-white/10 transition-all duration-300
-                        ${href ? "hover:border-violet-400/50 hover:-translate-y-1 cursor-pointer" : "cursor-default"}`}
-                      style={{ background: "rgba(255,255,255,.03)", backdropFilter: "blur(8px)" }}
+                        ${href ? "hover:border-blue-400/50 hover:-translate-y-1 cursor-pointer" : "cursor-default"}`}
+                      style={{ background: "rgba(19,27,46,0.6)", backdropFilter: "blur(8px)" }}
                     >
                       <span className="text-xl sm:text-2xl">{icon}</span>
                       <div>
@@ -545,7 +537,7 @@ export default function Home() {
               <div
                 className="absolute inset-0 rounded-3xl opacity-30 pointer-events-none"
                 style={{
-                  background: "radial-gradient(ellipse at center, rgba(124,58,237,.15) 0%, transparent 70%)",
+                  background: "radial-gradient(ellipse at center, rgba(37,99,235,.12) 0%, transparent 70%)",
                 }}
               />
               <p className="text-white/10 text-xs font-medium tracking-widest uppercase select-none">
@@ -561,7 +553,7 @@ export default function Home() {
       {/* ── FOOTER ── */}
       <footer className="relative z-10 py-8 text-center border-t border-white/10 pointer-events-auto">
         <p className="text-white/30 text-sm">
-          Built in Indonesia by <span className="text-violet-400 font-medium">Ega Surya Saputra</span>
+          Built in Indonesia by <span className="text-blue-400 font-medium">Ega Surya Saputra</span>
           {" "}· © {new Date().getFullYear()}
         </p>
       </footer>

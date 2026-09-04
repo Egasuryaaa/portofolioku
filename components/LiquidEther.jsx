@@ -398,20 +398,43 @@ export default function LiquidEther({
 }
 `;
     const color_frag = `
-    precision highp float;
+    #ifdef GL_FRAGMENT_PRECISION_HIGH
+      precision highp float;
+    #else
+      precision mediump float;
+    #endif
     uniform sampler2D velocity;
     uniform sampler2D palette;
     uniform vec4 bgColor;
+    uniform vec2 uResolution;
     varying vec2 uv;
+
+    // --- Triangular dither (TPDF) ---
+    // Converts two uniform random values into one triangular-distributed value in [-1, 1].
+    // Smoother than rectangular dither; eliminates quantization banding on 8-bit displays.
+    float triangularDither(vec2 seed) {
+      float r1 = fract(sin(dot(seed, vec2(127.1, 311.7))) * 43758.5453);
+      float r2 = fract(sin(dot(seed, vec2(269.5, 183.3))) * 12345.6789);
+      return (r1 - r2); // range [-1, 1], triangular distribution
+    }
+
     void main(){
-    vec2 vel = texture2D(velocity, uv).xy;
-    float lenv = clamp(length(vel), 0.0, 1.0);
-    vec3 c = texture2D(palette, vec2(lenv, 0.5)).rgb;
-    vec3 outRGB = mix(bgColor.rgb, c, lenv);
-    float outA = mix(bgColor.a, 1.0, lenv);
-    gl_FragColor = vec4(outRGB, outA);
-}
+      vec2 vel = texture2D(velocity, uv).xy;
+      float lenv = clamp(length(vel), 0.0, 1.0);
+      vec3 c = texture2D(palette, vec2(lenv, 0.5)).rgb;
+      vec3 outRGB = mix(bgColor.rgb, c, lenv);
+      float outA = mix(bgColor.a, 1.0, lenv);
+
+      // Apply dither before quantization to 8-bit framebuffer.
+      // Amplitude = 0.5/255 ≈ 0.00196 — just enough to mask 8-bit steps, invisible otherwise.
+      vec2 ditherSeed = gl_FragCoord.xy / max(uResolution, vec2(1.0));
+      float dither = triangularDither(ditherSeed) * (0.5 / 255.0);
+      outRGB += dither;
+
+      gl_FragColor = vec4(outRGB, outA);
+    }
 `;
+
     const divergence_frag = `
     precision highp float;
     uniform sampler2D velocity;
@@ -902,7 +925,9 @@ export default function LiquidEther({
               velocity: { value: this.simulation.fbos.vel_0.texture },
               boundarySpace: { value: new THREE.Vector2() },
               palette: { value: paletteTex },
-              bgColor: { value: bgVec4 }
+              bgColor: { value: bgVec4 },
+              // Screen resolution for dithering — keeps dither grain 1:1 pixel
+              uResolution: { value: new THREE.Vector2(Common.width, Common.height) }
             }
           })
         );
@@ -913,6 +938,10 @@ export default function LiquidEther({
       }
       resize() {
         this.simulation.resize();
+        // Keep dither grain 1:1 with actual screen pixels
+        if (this.output?.material?.uniforms?.uResolution) {
+          this.output.material.uniforms.uResolution.value.set(Common.width, Common.height);
+        }
       }
       render() {
         Common.renderer.setRenderTarget(null);
@@ -973,6 +1002,20 @@ export default function LiquidEther({
       }
       loop() {
         if (!this.running) return; // safety
+        // ── Mobile 30fps throttle ─────────────────────────────────────────────
+        // On mobile (pixelRatio capped at 1), target ~30fps to halve GPU work.
+        // Desktop always runs at native 60fps.
+        const isMobileThrottle = Common.pixelRatio <= 1 && Common.width < 1024;
+        if (isMobileThrottle) {
+          const now = performance.now();
+          const elapsed = now - (this._lastFrameTime || 0);
+          if (elapsed < 32) { // ~30fps = 33.3ms per frame
+            rafRef.current = requestAnimationFrame(this._loop);
+            return;
+          }
+          this._lastFrameTime = now - (elapsed % 32);
+        }
+        // ─────────────────────────────────────────────────────────────────────
         this.render();
         rafRef.current = requestAnimationFrame(this._loop);
       }
