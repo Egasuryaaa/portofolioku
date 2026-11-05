@@ -34,7 +34,7 @@ export const ScrollVelocity = ({
   className = '',
   damping = 50,
   stiffness = 400,
-  numCopies = 6,
+  numCopies = 3,
   velocityMapping = { input: [0, 1000], output: [0, 5] },
   parallaxClassName = 'parallax',
   scrollerClassName = 'scroller',
@@ -101,7 +101,12 @@ export const ScrollVelocity = ({
     const spans = [];
     for (let i = 0; i < numCopies; i++) {
       spans.push(
-        <span className={className} key={i} ref={i === 0 ? copyRef : null}>
+        <span
+          className={className}
+          key={i}
+          ref={i === 0 ? copyRef : null}
+          aria-hidden={i > 0 ? "true" : undefined}
+        >
           {children}&nbsp;
         </span>
       );
@@ -109,7 +114,10 @@ export const ScrollVelocity = ({
 
     return (
       <div className={parallaxClassName} style={parallaxStyle}>
-        <motion.div className={scrollerClassName} style={{ x, ...scrollerStyle }}>
+        <motion.div
+          className={scrollerClassName}
+          style={{ x, willChange: 'transform', ...scrollerStyle }}
+        >
           {spans}
         </motion.div>
       </div>

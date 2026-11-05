@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap");
-
 :root {
   /* ── Background ── */
   --background: #0A0E17;
@@ -83,6 +81,11 @@
 .section-shell {
   position: relative;
   background: transparent;
+}
+
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
 }
 
 .glass-nav {

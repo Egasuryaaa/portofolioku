@@ -364,7 +364,7 @@ export default function Home() {
         {/* ══════════════════════════════════════════
             EXPERIENCE
         ══════════════════════════════════════════ */}
-        <section id="experience" className="section-shell py-24 px-4 md:px-8 max-w-5xl mx-auto pointer-events-auto">
+        <section id="experience" className="section-shell content-auto py-24 px-4 md:px-8 max-w-5xl mx-auto pointer-events-auto">
           <h2 className="font-heading text-3xl font-bold text-white mb-2">Experience</h2>
           <div className="w-8 h-px mb-12" style={{ background: "rgba(37,99,235,0.5)" }} />
 
@@ -462,7 +462,7 @@ export default function Home() {
         {/* ══════════════════════════════════════════
             GALLERY  (placeholder — ganti src setelah ada foto)
         ══════════════════════════════════════════ */}
-        <section id="gallery" className="section-shell py-24 px-4 md:px-8 max-w-5xl mx-auto relative pointer-events-auto">
+        <section id="gallery" className="section-shell content-auto py-24 px-4 md:px-8 max-w-5xl mx-auto relative pointer-events-auto">
           <GradualBlur position="bottom" height="5rem" divCount={2} zIndex={10} />
 
           <h2 className="font-heading text-3xl font-bold text-white mb-2">Gallery</h2>
@@ -533,7 +533,7 @@ export default function Home() {
         {/* ══════════════════════════════════════════
             CONTACT
         ══════════════════════════════════════════ */}
-        <section id="contact" className="section-shell py-24 px-4 md:px-8 max-w-5xl mx-auto pointer-events-none">
+        <section id="contact" className="section-shell content-auto py-24 px-4 md:px-8 max-w-5xl mx-auto pointer-events-none">
           <div className="flex flex-col md:flex-row gap-12 items-start">
 
             {/* ── LEFT COLUMN: Title + Contact Cards ── */}
