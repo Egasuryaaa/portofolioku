@@ -329,7 +329,7 @@ export default function Home() {
               containerClassName="m-0"
               textClassName="text-white/60 text-2xl md:text-4xl lg:text-5xl font-semibold tracking-wide leading-relaxed text-justify"
             >
-              I'm currently in Semester 6 of D3 Informatics Engineering (graduating 2026). I love building clean scalable backend systems and exploring the full spectrum of development from APIs to mobile apps.
+              I&apos;m currently in Semester 6 of D3 Informatics Engineering (graduating 2026). I love building clean scalable backend systems and exploring the full spectrum of development from APIs to mobile apps.
             </ScrollFloat>
           </div>
         </section>

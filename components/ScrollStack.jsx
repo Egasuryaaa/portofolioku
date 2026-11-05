@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useRef, useCallback } from 'react';
 import Lenis from 'lenis';
+import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './ScrollStack.css';
 
@@ -229,16 +230,18 @@ const ScrollStack = ({
       lenis.on('scroll', handleScroll);
       lenis.on('scroll', () => ScrollTrigger.update());
 
-      const raf = time => {
-        lenis.raf(time);
-        animationFrameRef.current = requestAnimationFrame(raf);
+      const updateTicker = (time) => {
+        lenis.raf(time * 1000);
       };
-      animationFrameRef.current = requestAnimationFrame(raf);
+      gsap.ticker.add(updateTicker);
+      gsap.ticker.lagSmoothing(0);
 
       lenisRef.current = lenis;
-      // Sinkronisasi posisi trigger GSAP dengan Lenis
       ScrollTrigger.refresh();
-      return lenis;
+      return () => {
+        gsap.ticker.remove(updateTicker);
+        lenis.destroy();
+      };
     } else {
       const scroller = scrollerRef.current;
       if (!scroller) return;
@@ -263,16 +266,18 @@ const ScrollStack = ({
       lenis.on('scroll', handleScroll);
       lenis.on('scroll', () => ScrollTrigger.update());
 
-      const raf = time => {
-        lenis.raf(time);
-        animationFrameRef.current = requestAnimationFrame(raf);
+      const updateTicker = (time) => {
+        lenis.raf(time * 1000);
       };
-      animationFrameRef.current = requestAnimationFrame(raf);
+      gsap.ticker.add(updateTicker);
+      gsap.ticker.lagSmoothing(0);
 
       lenisRef.current = lenis;
-      // Sinkronisasi posisi trigger GSAP dengan Lenis
       ScrollTrigger.refresh();
-      return lenis;
+      return () => {
+        gsap.ticker.remove(updateTicker);
+        lenis.destroy();
+      };
     }
   }, [handleScroll, useWindowScroll]);
 
@@ -303,7 +308,7 @@ const ScrollStack = ({
     });
 
     cacheElementOffsets();
-    setupLenis();
+    const cleanupLenis = setupLenis();
     updateCardTransforms();
 
     const handleResize = () => {
@@ -318,10 +323,9 @@ const ScrollStack = ({
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll);
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-      if (lenisRef.current) {
+      if (typeof cleanupLenis === 'function') {
+        cleanupLenis();
+      } else if (lenisRef.current) {
         lenisRef.current.destroy();
       }
       stackCompletedRef.current = false;
