@@ -48,7 +48,7 @@ const projects = [
     subtitle: "Kominfo Gunungkidul",
     desc: "Web-based app for submitting and tracking network complaints. Staff can report issues and monitor resolution in real time.",
     tags: ["CodeIgniter", "PostgreSQL", "REST API", "Flutter"],
-    image: "/gallery/aplikasi Pengaduan Kominfo.png",
+    image: "/gallery/aplikasi-pengaduan-kominfo.webp",
     imageClass: "object-contain p-4 md:p-6",
   },
   {
@@ -57,7 +57,7 @@ const projects = [
     subtitle: "Gunungkidul Regency",
     desc: "Platform connecting residents with local tradespeople. Features: worker listings, category search, direct contact.",
     tags: ["Flutter", "MySQL", "REST API", "CodeIgniter"],
-    image: "/gallery/Aplikasi Rampungin.id.png",
+    image: "/gallery/aplikasi-rampungin-id.webp",
     imageClass: "object-contain p-4 md:p-6",
   },
   {
@@ -66,7 +66,7 @@ const projects = [
     subtitle: "Aquaculture Marketplace App",
     desc: "Mobile app for fish pond owners to market products and connect with buyers. Booking, listings, and scheduling.",
     tags: ["Flutter", "Laravel", "REST API", "MySQL"],
-    image: "/gallery/Website Iwakmart.png",
+    image: "/gallery/website-iwakmart.webp",
     imageClass: "object-contain p-4 md:p-6",
   },
   {
@@ -75,7 +75,7 @@ const projects = [
     subtitle: "Website",
     desc: "A web platform for custom formal wear and clothing marketplace.",
     tags: ["Laravel", "Tailwind CSS", "MySQL"],
-    image: "/gallery/Website Formalfitku.png",
+    image: "/gallery/website-formalfitku.webp",
     imageClass: "object-contain p-4 md:p-6",
   },
   {
@@ -84,7 +84,7 @@ const projects = [
     subtitle: "IoT Tracking System",
     desc: "A smart backpack equipped with IoT geofencing technology to track location and ensure the security of belongings.",
     tags: ["IoT", "Geofencing", "Hardware"],
-    image: "/gallery/IOT Geofence Smart Tracker Backpack.png",
+    image: "/gallery/iot-geofence-smart-tracker-backpack.webp",
     imageClass: "object-contain p-4 md:p-6",
   },
 ];
@@ -418,7 +418,8 @@ export default function Home() {
                       src={p.image}
                       alt={p.title}
                       fill
-                      sizes="(max-width: 768px) 100vw, 50vw"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 450px"
+                      quality={88}
                       loading="lazy"
                       className={`transition-transform duration-700 group-hover/img:scale-105 ${p.imageClass}`}
                     />
@@ -459,16 +460,54 @@ export default function Home() {
 
           <div className="columns-1 sm:columns-2 md:columns-3 gap-4 space-y-4">
             {[
-              { src: "/gallery/galeri/WhatsApp Image 2025-09-15 at 17.58.20_fc91aebc.jpg", caption: "Bimtek aplikasi DOPADU GK" },
-              { src: "/gallery/galeri/WhatsApp Image 2026-07-21 at 10.36.01.jpeg", caption: "Presentasi Bakcend API Aplikasi " },
-              { src: "/gallery/galeri/WhatsApp Image 2026-07-21 at 10.36.43.jpeg", caption: "Dokumentasi Internship" },
-              { src: "/gallery/galeri/WhatsApp Image 2026-07-21 at 10.39.11.jpeg", caption: "Dokumentasi Development Aplikasi" },
-              { src: "/gallery/galeri/WhatsApp Image 2026-07-21 at 12.12.14.jpeg", caption: "Sosialisasi dan Bimtek Aplikasi IwakRejosari" },
+              {
+                src: "/gallery/galeri/bimtek-aplikasi-dopadu-gk.webp",
+                caption: "Bimtek aplikasi DOPADU GK",
+                alt: "Bimbingan Teknis dan pelatihan penggunaan aplikasi DOPADU Gunungkidul",
+                width: 800,
+                height: 450
+              },
+              {
+                src: "/gallery/galeri/presentasi-backend-api.webp",
+                caption: "Presentasi Backend API Aplikasi",
+                alt: "Presentasi arsitektur dan endpoint backend REST API aplikasi",
+                width: 800,
+                height: 441
+              },
+              {
+                src: "/gallery/galeri/dokumentasi-internship-diskominfo.webp",
+                caption: "Dokumentasi Internship",
+                alt: "Dokumentasi kegiatan magang di Diskominfo Gunungkidul",
+                width: 800,
+                height: 600
+              },
+              {
+                src: "/gallery/galeri/dokumentasi-development-aplikasi.webp",
+                caption: "Dokumentasi Development Aplikasi",
+                alt: "Dokumentasi proses pengembangan aplikasi dan sistem",
+                width: 800,
+                height: 1422
+              },
+              {
+                src: "/gallery/galeri/sosialisasi-bimtek-iwakrejosari.webp",
+                caption: "Sosialisasi dan Bimtek Aplikasi IwakRejosari",
+                alt: "Sosialisasi dan bimbingan teknis aplikasi budidaya perikanan IwakRejosari",
+                width: 800,
+                height: 1067
+              },
             ].map((item, idx) => (
               <FadeContent blur={false} duration={1000} delay={idx * 150} key={item.src} className="break-inside-avoid">
                 <div className="gallery-item group relative overflow-hidden rounded-2xl cursor-pointer">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={item.src} alt={item.caption} className="w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <Image
+                    src={item.src}
+                    alt={item.alt}
+                    width={item.width}
+                    height={item.height}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    quality={85}
+                    loading="lazy"
+                    className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
                   <div
                     className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4"
                     style={{ background: "linear-gradient(to top,rgba(10,14,23,.9),transparent)" }}

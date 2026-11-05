@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import GradientText from "./GradientText";
 import "./MorphTechLogo.css";
@@ -80,10 +81,12 @@ export default function MorphTechLogo({ size = "md", className = "", onClick = u
                   }`}
               >
                 {/* Technology Icon Asset */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src="/assets/technology.png"
                   alt="Surya Tech Icon"
+                  width={32}
+                  height={32}
+                  priority
                   className={`object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] group-hover:scale-115 group-hover:rotate-180 transition-all duration-700 ${isSmall ? "w-5 h-5" : "w-6 h-6 md:w-7 md:h-7"
                     }`}
                 />
