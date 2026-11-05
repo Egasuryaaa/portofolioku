@@ -86,7 +86,9 @@ export default function LiquidEther({
       init(container) {
         this.container = container;
         const isTabletOrPhone = typeof window !== 'undefined' && window.innerWidth < 1024;
-        this.pixelRatio = Math.min(window.devicePixelRatio || 1, isTabletOrPhone ? 1 : 1.25);
+        const cores = typeof navigator !== 'undefined' ? (navigator.hardwareConcurrency || 4) : 4;
+        const isDesktopPowerful = !isTabletOrPhone && cores >= 4;
+        this.pixelRatio = Math.min(window.devicePixelRatio || 1, isTabletOrPhone ? 1 : (isDesktopPowerful ? 2 : 1.25));
         this.resize();
         this.renderer = new THREE.WebGLRenderer({ antialias: !isTabletOrPhone, alpha: true, powerPreference: "high-performance" });
         this.renderer.autoClear = false;
@@ -862,7 +864,9 @@ export default function LiquidEther({
       }
       calcSize() {
         const isMobile = Common.width < 1024;
-        const maxSimDim = isMobile ? 220 : 360;
+        const cores = typeof navigator !== 'undefined' ? (navigator.hardwareConcurrency || 4) : 4;
+        const isDesktopPowerful = !isMobile && cores >= 4;
+        const maxSimDim = isDesktopPowerful ? 512 : (isMobile ? 220 : 360);
         let width = Math.max(1, Math.round(this.options.resolution * Common.width));
         let height = Math.max(1, Math.round(this.options.resolution * Common.height));
 

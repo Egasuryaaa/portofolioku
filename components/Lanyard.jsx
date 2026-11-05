@@ -208,6 +208,16 @@ if (cardGLBPath) {
   useGLTF.preload(cardGLBPath);
 }
 
+function checkWebGLSupport() {
+  if (typeof window === "undefined") return true;
+  try {
+    const canvas = document.createElement("canvas");
+    return !!(window.WebGLRenderingContext && (canvas.getContext("webgl") || canvas.getContext("experimental-webgl")));
+  } catch (e) {
+    return false;
+  }
+}
+
 export default function Lanyard({
   position = [0, 0, 30],
   gravity = [0, -40, 0],
@@ -216,14 +226,24 @@ export default function Lanyard({
 }) {
   const containerRef = useRef(null);
   const [inView, setInView] = useState(true);
+  const [isTabActive, setIsTabActive] = useState(true);
+  const [hasWebGL, setHasWebGL] = useState(true);
   const [isMobile, setIsMobile] = useState(
     () => typeof window !== "undefined" && window.innerWidth < 1024,
   );
 
   useEffect(() => {
+    setHasWebGL(checkWebGLSupport());
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+
+    const handleVis = () => setIsTabActive(!document.hidden);
+    document.addEventListener("visibilitychange", handleVis);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      document.removeEventListener("visibilitychange", handleVis);
+    };
   }, []);
 
   useEffect(() => {
@@ -238,12 +258,26 @@ export default function Lanyard({
     return () => observer.disconnect();
   }, []);
 
+  if (!hasWebGL) {
+    return (
+      <div className="lanyard-wrapper flex items-center justify-center" ref={containerRef}>
+        <div className="w-[180px] h-[260px] rounded-2xl border border-white/20 bg-surface/80 backdrop-blur-md p-4 flex flex-col items-center justify-center text-center shadow-2xl">
+          <div className="w-16 h-16 rounded-full bg-blue-600/30 flex items-center justify-center mb-3">
+            <span className="text-2xl">🪪</span>
+          </div>
+          <p className="font-heading font-bold text-white text-sm">Ega Surya</p>
+          <p className="font-mono text-[10px] text-blue-400">Developer ID</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="lanyard-wrapper" ref={containerRef}>
       <Canvas
-        frameloop={inView ? "always" : "never"}
+        frameloop={inView && isTabActive ? "always" : "never"}
         camera={{ position, fov }}
-        dpr={[1, isMobile ? 1 : 1.5]}
+        dpr={[1, isMobile ? 1 : 1.75]}
         gl={{ alpha: transparent, antialias: !isMobile, powerPreference: "high-performance" }}
         onCreated={({ gl }) =>
           gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1)

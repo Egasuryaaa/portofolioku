@@ -75,8 +75,10 @@ function AnimatedModel({ url, scrollYProgress, isMobile }) {
 export default function ScrollModel3D({ modelUrl = "/assets/asset3drobot.glb" }) {
   const [isMobile, setIsMobile] = useState(false);
   const [isAtContact, setIsAtContact] = useState(false);
-  // DPR range: managed reactively so PerformanceMonitor can adjust at runtime
-  const [dpr, setDpr] = useState([1, 1.15]);
+  const [isTabActive, setIsTabActive] = useState(true);
+  const [hasWebGL, setHasWebGL] = useState(true);
+  // DPR: desktop kuat tetap tajam penuh (hingga 2.0), mobile dioptimalkan ke 1.0
+  const [dpr, setDpr] = useState([1, 1.5]);
 
   const { scrollYProgress } = useScroll();
 
@@ -85,16 +87,34 @@ export default function ScrollModel3D({ modelUrl = "/assets/asset3drobot.glb" })
   });
 
   useEffect(() => {
-    const checkMobile = () => {
+    try {
+      const c = document.createElement("canvas");
+      setHasWebGL(!!(window.WebGLRenderingContext && (c.getContext("webgl") || c.getContext("experimental-webgl"))));
+    } catch {
+      setHasWebGL(false);
+    }
+
+    const checkDevice = () => {
       const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
-      // DPR capped to 1.0 on mobile and 1.25 on desktop for optimal FPS
-      setDpr([1, mobile ? 1.0 : 1.25]);
+      // Desktop tetap tajam hingga DPR 2.0, mobile dibatasi 1.0 agar tidak lag
+      const maxDpr = mobile ? 1.0 : Math.min(window.devicePixelRatio || 1, 2.0);
+      setDpr([1, maxDpr]);
     };
-    checkMobile();
-    window.addEventListener("resize", checkMobile, { passive: true });
-    return () => window.removeEventListener("resize", checkMobile);
+
+    checkDevice();
+    window.addEventListener("resize", checkDevice, { passive: true });
+
+    const handleVis = () => setIsTabActive(!document.hidden);
+    document.addEventListener("visibilitychange", handleVis);
+
+    return () => {
+      window.removeEventListener("resize", checkDevice);
+      document.removeEventListener("visibilitychange", handleVis);
+    };
   }, []);
+
+  if (!hasWebGL) return null;
 
   return (
     <div
@@ -108,14 +128,15 @@ export default function ScrollModel3D({ modelUrl = "/assets/asset3drobot.glb" })
       }}
     >
       <Canvas
+        frameloop={isTabActive ? "always" : "never"}
         camera={{ position: [0, 0, 8], fov: 55 }}
         dpr={dpr}
         gl={{ alpha: true, antialias: false, stencil: false, powerPreference: "high-performance" }}
         style={{ background: "transparent" }}
       >
         <PerformanceMonitor
-          onDecline={() => setDpr([1, 1])}
-          onIncline={() => setDpr([1, isMobile ? 1.0 : 1.25])}
+          onDecline={() => setDpr([1, 1.0])}
+          onIncline={() => setDpr([1, isMobile ? 1.0 : Math.min(window.devicePixelRatio || 1, 2.0)])}
           flipflops={3}
           threshold={0.85}
         >

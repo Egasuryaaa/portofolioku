@@ -105,10 +105,20 @@ export default function Home() {
 
   // SSR-safe mobile detection — never reads window during server render
   const [isMobile, setIsMobile] = useState(false);
+  const [load3D, setLoad3D] = useState(false);
+
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
     check();
     window.addEventListener("resize", check, { passive: true });
+
+    // Idle load untuk 3D robot agar First Contentful Paint & TBT tidak terblokir
+    if ("requestIdleCallback" in window) {
+      (window as any).requestIdleCallback(() => setLoad3D(true), { timeout: 1200 });
+    } else {
+      setTimeout(() => setLoad3D(true), 400);
+    }
+
     return () => window.removeEventListener("resize", check);
   }, []);
 
@@ -128,8 +138,8 @@ export default function Home() {
           autoSpeed={isMobile ? 0.15 : 0.35}
           autoIntensity={isMobile ? 0.8 : 1.8}
           mouseForce={isMobile ? 6 : 18}
-          resolution={isMobile ? 0.22 : 0.32}
-          iterationsPoisson={isMobile ? 6 : 12}
+          resolution={isMobile ? 0.25 : 0.45}
+          iterationsPoisson={isMobile ? 6 : 20}
           iterationsViscous={isMobile ? 4 : 8}
           dt={isMobile ? 0.02 : 0.014}
         />
@@ -137,8 +147,8 @@ export default function Home() {
 
       {/* rollback performance */}
 
-      {/* ── 3D SCROLL MODEL ── */}
-      <ScrollModel3D />
+      {/* ── 3D SCROLL MODEL (Lazy loaded via requestIdleCallback) ── */}
+      {load3D && <ScrollModel3D />}
 
       {/* ── DESKTOP NAVBAR ── */}
       <header className="hidden md:flex fixed top-0 inset-x-0 z-50 justify-center px-4 pt-4 pointer-events-none">
