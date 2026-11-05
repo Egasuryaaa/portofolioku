@@ -10,11 +10,9 @@ import ScrollVelocity from "@/components/ScrollVelocity";
 import ScrollFloat from "@/components/ScrollFloat";
 import GradualBlur from "@/components/GradualBlur";
 import ScrollStack, { ScrollStackItem } from "@/components/ScrollStack";
-import GradientText from "@/components/GradientText";
 import FadeContent from "@/components/FadeContent";
 import BubbleMenu from "@/components/BubbleMenu";
 import TextType from "@/components/TextType";
-import AnimatedContent from "@/components/AnimatedContent";
 import MorphTechLogo from "@/components/MorphTechLogo";
 
 // SSR: false untuk component yang pakai WebGL / window
