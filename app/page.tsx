@@ -105,18 +105,18 @@ export default function Home() {
 
   // SSR-safe mobile detection — never reads window during server render
   const [isMobile, setIsMobile] = useState(false);
-  const [load3D, setLoad3D] = useState(false);
+  const [loadWebGL, setLoadWebGL] = useState(false);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
     check();
     window.addEventListener("resize", check, { passive: true });
 
-    // Idle load untuk 3D robot agar First Contentful Paint & TBT tidak terblokir
+    // Idle load untuk seluruh WebGL & WASM Physics agar FCP, LCP, dan TBT tidak terblokir
     if ("requestIdleCallback" in window) {
-      (window as any).requestIdleCallback(() => setLoad3D(true), { timeout: 1200 });
+      (window as any).requestIdleCallback(() => setLoadWebGL(true), { timeout: 1000 });
     } else {
-      setTimeout(() => setLoad3D(true), 400);
+      setTimeout(() => setLoadWebGL(true), 350);
     }
 
     return () => window.removeEventListener("resize", check);
@@ -130,25 +130,25 @@ export default function Home() {
     >
       {/* ── BACKGROUND ── */}
       <LiquidBackground />
-      <div className="fixed inset-0 -z-10">
-        <LiquidEther
-          colors={["#0D1E3B", "#2563EB", "#38BDF8"]}
-          style={{ width: "100%", height: "100%" }}
-          autoDemo
-          autoSpeed={isMobile ? 0.15 : 0.35}
-          autoIntensity={isMobile ? 0.8 : 1.8}
-          mouseForce={isMobile ? 6 : 18}
-          resolution={isMobile ? 0.25 : 0.45}
-          iterationsPoisson={isMobile ? 6 : 20}
-          iterationsViscous={isMobile ? 4 : 8}
-          dt={isMobile ? 0.02 : 0.014}
-        />
-      </div>
-
-      {/* rollback performance */}
+      {loadWebGL && (
+        <div className="fixed inset-0 -z-10">
+          <LiquidEther
+            colors={["#0D1E3B", "#2563EB", "#38BDF8"]}
+            style={{ width: "100%", height: "100%" }}
+            autoDemo
+            autoSpeed={isMobile ? 0.15 : 0.35}
+            autoIntensity={isMobile ? 0.8 : 1.8}
+            mouseForce={isMobile ? 6 : 18}
+            resolution={isMobile ? 0.25 : 0.45}
+            iterationsPoisson={isMobile ? 6 : 20}
+            iterationsViscous={isMobile ? 4 : 8}
+            dt={isMobile ? 0.02 : 0.014}
+          />
+        </div>
+      )}
 
       {/* ── 3D SCROLL MODEL (Lazy loaded via requestIdleCallback) ── */}
-      {load3D && <ScrollModel3D />}
+      {loadWebGL && <ScrollModel3D />}
 
       {/* ── DESKTOP NAVBAR ── */}
       <header className="hidden md:flex fixed top-0 inset-x-0 z-50 justify-center px-4 pt-4 pointer-events-none">
@@ -269,7 +269,19 @@ export default function Home() {
 
             {/* right — Lanyard 3D card */}
             <div className="flex justify-center md:justify-end h-[350px] md:h-[480px]">
-              <Lanyard position={[0, 0, 20]} gravity={[0, -40, 0]} fov={20} transparent />
+              {loadWebGL ? (
+                <Lanyard position={[0, 0, 20]} gravity={[0, -40, 0]} fov={20} transparent />
+              ) : (
+                <div className="lanyard-wrapper flex items-center justify-center animate-pulse">
+                  <div className="w-[180px] h-[260px] rounded-2xl border border-white/10 bg-[#131B2E]/60 backdrop-blur-md p-4 flex flex-col items-center justify-center text-center shadow-xl">
+                    <div className="w-16 h-16 rounded-full bg-blue-600/20 flex items-center justify-center mb-3">
+                      <span className="text-2xl">🪪</span>
+                    </div>
+                    <p className="font-heading font-bold text-white/80 text-sm">Ega Surya</p>
+                    <p className="font-mono text-[10px] text-blue-400/80">Developer ID</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>
