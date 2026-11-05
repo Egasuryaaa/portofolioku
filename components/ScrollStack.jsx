@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useRef, useCallback } from 'react';
 import Lenis from 'lenis';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './ScrollStack.css';
 
 export const ScrollStackItem = ({ children, itemClassName = '' }) => (
@@ -28,6 +29,8 @@ const ScrollStack = ({
   const animationFrameRef = useRef(null);
   const lenisRef = useRef(null);
   const cardsRef = useRef([]);
+  const cardTopsRef = useRef([]);
+  const endElementTopRef = useRef(0);
   const lastTransformsRef = useRef(new Map());
   const isUpdatingRef = useRef(false);
 
@@ -47,7 +50,7 @@ const ScrollStack = ({
   const getScrollData = useCallback(() => {
     if (useWindowScroll) {
       return {
-        scrollTop: window.scrollY,
+        scrollTop: window.scrollY || window.pageYOffset || 0,
         containerHeight: window.innerHeight,
         scrollContainer: document.documentElement
       };
@@ -61,7 +64,7 @@ const ScrollStack = ({
     }
   }, [useWindowScroll]);
 
-  const getElementOffset = useCallback(
+  const measureElementOffset = useCallback(
     element => {
       if (useWindowScroll) {
         let top = 0;
@@ -78,6 +81,21 @@ const ScrollStack = ({
     [useWindowScroll]
   );
 
+  // Cache offsets to avoid forced layout reflows on every single scroll frame
+  const cacheElementOffsets = useCallback(() => {
+    if (!cardsRef.current.length) return;
+
+    cardTopsRef.current = cardsRef.current.map(card => {
+      return card ? measureElementOffset(card) : 0;
+    });
+
+    const endElement = useWindowScroll
+      ? document.querySelector('.scroll-stack-end')
+      : scrollerRef.current?.querySelector('.scroll-stack-end');
+
+    endElementTopRef.current = endElement ? measureElementOffset(endElement) : 0;
+  }, [measureElementOffset, useWindowScroll]);
+
   const updateCardTransforms = useCallback(() => {
     if (!cardsRef.current.length || isUpdatingRef.current) return;
 
@@ -87,16 +105,14 @@ const ScrollStack = ({
     const stackPositionPx = parsePercentage(stackPosition, containerHeight);
     const scaleEndPositionPx = parsePercentage(scaleEndPosition, containerHeight);
 
-    const endElement = useWindowScroll
-      ? document.querySelector('.scroll-stack-end')
-      : scrollerRef.current?.querySelector('.scroll-stack-end');
-
-    const endElementTop = endElement ? getElementOffset(endElement) : 0;
+    const endElementTop = endElementTopRef.current;
+    const cardTops = cardTopsRef.current;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
 
     cardsRef.current.forEach((card, i) => {
       if (!card) return;
 
-      const cardTop = getElementOffset(card);
+      const cardTop = cardTops[i] ?? 0;
       const triggerStart = cardTop - stackPositionPx - itemStackDistance * i;
       const triggerEnd = cardTop - scaleEndPositionPx;
       const pinStart = cardTop - stackPositionPx - itemStackDistance * i;
@@ -105,14 +121,13 @@ const ScrollStack = ({
       const scaleProgress = calculateProgress(scrollTop, triggerStart, triggerEnd);
       const targetScale = baseScale + i * itemScale;
       const scale = 1 - scaleProgress * (1 - targetScale);
-      const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
       const rotation = (rotationAmount && !isMobile) ? i * rotationAmount * scaleProgress : 0;
 
       let blur = 0;
       if (blurAmount && !isMobile) {
         let topCardIndex = 0;
-        for (let j = 0; j < cardsRef.current.length; j++) {
-          const jCardTop = getElementOffset(cardsRef.current[j]);
+        for (let j = 0; j < cardTops.length; j++) {
+          const jCardTop = cardTops[j];
           const jTriggerStart = jCardTop - stackPositionPx - itemStackDistance * j;
           if (scrollTop >= jTriggerStart) {
             topCardIndex = j;
@@ -154,7 +169,9 @@ const ScrollStack = ({
         const filter = newTransform.blur > 0 ? `blur(${newTransform.blur}px)` : '';
 
         card.style.transform = transform;
-        card.style.filter = filter;
+        if (card.style.filter !== filter) {
+          card.style.filter = filter;
+        }
 
         lastTransformsRef.current.set(i, newTransform);
       }
@@ -179,12 +196,10 @@ const ScrollStack = ({
     baseScale,
     rotationAmount,
     blurAmount,
-    useWindowScroll,
     onStackComplete,
     calculateProgress,
     parsePercentage,
-    getScrollData,
-    getElementOffset
+    getScrollData
   ]);
 
   const handleScroll = useCallback(() => {
@@ -192,20 +207,27 @@ const ScrollStack = ({
   }, [updateCardTransforms]);
 
   const setupLenis = useCallback(() => {
+    const isTouch = typeof window !== 'undefined' && (
+      'ontouchstart' in window ||
+      navigator.maxTouchPoints > 0 ||
+      window.innerWidth < 1024
+    );
+
     if (useWindowScroll) {
+      // Pada mobile / touch devices: syncTouch = false agar browser menggunakan native 120Hz/60Hz touch scroll
       const lenis = new Lenis({
-        duration: 1.2,
+        duration: isTouch ? 0.8 : 1.2,
         easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         smoothWheel: true,
-        touchMultiplier: 2,
+        touchMultiplier: 1.5,
         infinite: false,
         wheelMultiplier: 1,
         lerp: 0.1,
-        syncTouch: true,
-        syncTouchLerp: 0.075
+        syncTouch: false
       });
 
       lenis.on('scroll', handleScroll);
+      lenis.on('scroll', () => ScrollTrigger.update());
 
       const raf = time => {
         lenis.raf(time);
@@ -214,6 +236,8 @@ const ScrollStack = ({
       animationFrameRef.current = requestAnimationFrame(raf);
 
       lenisRef.current = lenis;
+      // Sinkronisasi posisi trigger GSAP dengan Lenis
+      ScrollTrigger.refresh();
       return lenis;
     } else {
       const scroller = scrollerRef.current;
@@ -225,19 +249,19 @@ const ScrollStack = ({
         duration: 1.2,
         easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         smoothWheel: true,
-        touchMultiplier: 2,
+        touchMultiplier: 1.5,
         infinite: false,
         gestureOrientationHandler: true,
         normalizeWheel: true,
         wheelMultiplier: 1,
         touchInertiaMultiplier: 35,
         lerp: 0.1,
-        syncTouch: true,
-        syncTouchLerp: 0.075,
+        syncTouch: false,
         touchInertia: 0.6
       });
 
       lenis.on('scroll', handleScroll);
+      lenis.on('scroll', () => ScrollTrigger.update());
 
       const raf = time => {
         lenis.raf(time);
@@ -246,6 +270,8 @@ const ScrollStack = ({
       animationFrameRef.current = requestAnimationFrame(raf);
 
       lenisRef.current = lenis;
+      // Sinkronisasi posisi trigger GSAP dengan Lenis
+      ScrollTrigger.refresh();
       return lenis;
     }
   }, [handleScroll, useWindowScroll]);
@@ -276,11 +302,22 @@ const ScrollStack = ({
       card.style.webkitPerspective = '1000px';
     });
 
+    cacheElementOffsets();
     setupLenis();
-
     updateCardTransforms();
 
+    const handleResize = () => {
+      cacheElementOffsets();
+      updateCardTransforms();
+    };
+
+    window.addEventListener('resize', handleResize, { passive: true });
+    // Passive scroll listener memastikan scroll sentuh native di HP tetap meng-update kartu secara instan
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
     return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll);
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
@@ -289,6 +326,7 @@ const ScrollStack = ({
       }
       stackCompletedRef.current = false;
       cardsRef.current = [];
+      cardTopsRef.current = [];
       transformsCache.clear();
       isUpdatingRef.current = false;
     };
@@ -305,7 +343,9 @@ const ScrollStack = ({
     useWindowScroll,
     onStackComplete,
     setupLenis,
-    updateCardTransforms
+    updateCardTransforms,
+    cacheElementOffsets,
+    handleScroll
   ]);
 
   return (

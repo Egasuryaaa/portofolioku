@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
 import LiquidBackground from "@/components/LiquidBackground";
 import _RotatingText from "@/components/RotatingText";
@@ -126,12 +127,12 @@ export default function Home() {
           colors={["#0D1E3B", "#2563EB", "#38BDF8"]}
           style={{ width: "100%", height: "100%" }}
           autoDemo
-          autoSpeed={isMobile ? 0.15 : 0.4}
-          autoIntensity={isMobile ? 0.8 : 2.0}
-          mouseForce={isMobile ? 6 : 20}
-          resolution={isMobile ? 0.28 : 0.45}
-          iterationsPoisson={isMobile ? 8 : 28}
-          iterationsViscous={isMobile ? 8 : 28}
+          autoSpeed={isMobile ? 0.15 : 0.35}
+          autoIntensity={isMobile ? 0.8 : 1.8}
+          mouseForce={isMobile ? 6 : 18}
+          resolution={isMobile ? 0.22 : 0.32}
+          iterationsPoisson={isMobile ? 6 : 12}
+          iterationsViscous={isMobile ? 4 : 8}
           dt={isMobile ? 0.02 : 0.014}
         />
       </div>
@@ -414,15 +415,14 @@ export default function Home() {
                   itemClassName="!p-0 flex flex-col md:flex-row !h-auto min-h-[340px] md:min-h-[440px] bg-[#131B2E]/95 md:bg-[#131B2E]/90 md:backdrop-blur-[12px] border border-white/10 rounded-[16px] md:rounded-[40px] overflow-hidden"
                 >
                   {/* IMAGE */}
-                  <div className="w-full md:w-6/12 h-[200px] md:h-auto bg-white/5 relative flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10 overflow-hidden group/img">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                  <div className="w-full md:w-6/12 h-[220px] md:h-auto min-h-[220px] bg-white/5 relative flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10 overflow-hidden group/img">
+                    <Image
                       src={p.image}
                       alt={p.title}
-                      width={400}
-                      height={300}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
                       loading="lazy"
-                      className={`w-full h-full transition-transform duration-700 group-hover/img:scale-110 ${p.imageClass}`}
+                      className={`transition-transform duration-700 group-hover/img:scale-105 ${p.imageClass}`}
                     />
                   </div>
 
@@ -454,7 +454,7 @@ export default function Home() {
             GALLERY  (placeholder — ganti src setelah ada foto)
         ══════════════════════════════════════════ */}
         <section id="gallery" className="section-shell py-24 px-4 md:px-8 max-w-5xl mx-auto relative pointer-events-auto">
-          <GradualBlur position="bottom" height="6rem" zIndex={10} />
+          <GradualBlur position="bottom" height="5rem" divCount={2} zIndex={10} />
 
           <h2 className="font-heading text-3xl font-bold text-white mb-2">Gallery</h2>
           <div className="w-8 h-px mb-12" style={{ background: "rgba(37,99,235,0.5)" }} />
@@ -467,7 +467,7 @@ export default function Home() {
               { src: "/gallery/galeri/WhatsApp Image 2026-07-21 at 10.39.11.jpeg", caption: "Dokumentasi Development Aplikasi" },
               { src: "/gallery/galeri/WhatsApp Image 2026-07-21 at 12.12.14.jpeg", caption: "Sosialisasi dan Bimtek Aplikasi IwakRejosari" },
             ].map((item, idx) => (
-              <FadeContent blur={true} duration={2000} delay={idx * 300} key={item.src} className="break-inside-avoid">
+              <FadeContent blur={false} duration={1000} delay={idx * 150} key={item.src} className="break-inside-avoid">
                 <div className="gallery-item group relative overflow-hidden rounded-2xl cursor-pointer">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={item.src} alt={item.caption} className="w-full object-cover transition-transform duration-500 group-hover:scale-105" />

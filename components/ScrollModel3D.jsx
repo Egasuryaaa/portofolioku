@@ -76,7 +76,7 @@ export default function ScrollModel3D({ modelUrl = "/assets/asset3drobot.glb" })
   const [isMobile, setIsMobile] = useState(false);
   const [isAtContact, setIsAtContact] = useState(false);
   // DPR range: managed reactively so PerformanceMonitor can adjust at runtime
-  const [dpr, setDpr] = useState([1, 1.25]);
+  const [dpr, setDpr] = useState([1, 1.15]);
 
   const { scrollYProgress } = useScroll();
 
@@ -88,8 +88,8 @@ export default function ScrollModel3D({ modelUrl = "/assets/asset3drobot.glb" })
     const checkMobile = () => {
       const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
-      // Give mobile a ceiling of 1.5, desktop 1.75 — PerformanceMonitor can lower further
-      setDpr([1, mobile ? 1.5 : 1.75]);
+      // DPR capped to 1.0 on mobile and 1.25 on desktop for optimal FPS
+      setDpr([1, mobile ? 1.0 : 1.25]);
     };
     checkMobile();
     window.addEventListener("resize", checkMobile, { passive: true });
@@ -110,27 +110,20 @@ export default function ScrollModel3D({ modelUrl = "/assets/asset3drobot.glb" })
       <Canvas
         camera={{ position: [0, 0, 8], fov: 55 }}
         dpr={dpr}
-        gl={{ alpha: true, antialias: !isMobile, powerPreference: "high-performance" }}
+        gl={{ alpha: true, antialias: false, stencil: false, powerPreference: "high-performance" }}
         style={{ background: "transparent" }}
       >
-        {/*
-          PerformanceMonitor: watches FPS budget.
-          - onDecline: FPS drops below threshold → clamp DPR to 1x (biggest GPU relief)
-          - onIncline: FPS recovers → restore to device-appropriate max DPR
-          - flipflops: stops oscillating after 3 cycles (prevents yo-yo effect)
-        */}
         <PerformanceMonitor
           onDecline={() => setDpr([1, 1])}
-          onIncline={() => setDpr([1, isMobile ? 1.5 : 1.75])}
+          onIncline={() => setDpr([1, isMobile ? 1.0 : 1.25])}
           flipflops={3}
-          threshold={0.9}
+          threshold={0.85}
         >
           <AdaptiveDpr pixelated />
 
-          <ambientLight intensity={0.7} />
-          <directionalLight position={[5, 5, 5]} intensity={1.4} />
-          <directionalLight position={[-4, -2, 4]} intensity={0.5} />
-          <directionalLight position={[0, 3, -3]} intensity={0.3} />
+          <ambientLight intensity={0.9} />
+          <directionalLight position={[5, 5, 5]} intensity={1.6} />
+          <directionalLight position={[-4, 2, -2]} intensity={0.4} />
 
           <Suspense fallback={null}>
             <AnimatedModel

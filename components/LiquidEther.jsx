@@ -86,7 +86,7 @@ export default function LiquidEther({
       init(container) {
         this.container = container;
         const isTabletOrPhone = typeof window !== 'undefined' && window.innerWidth < 1024;
-        this.pixelRatio = Math.min(window.devicePixelRatio || 1, isTabletOrPhone ? 1 : 2);
+        this.pixelRatio = Math.min(window.devicePixelRatio || 1, isTabletOrPhone ? 1 : 1.25);
         this.resize();
         this.renderer = new THREE.WebGLRenderer({ antialias: !isTabletOrPhone, alpha: true, powerPreference: "high-performance" });
         this.renderer.autoClear = false;
@@ -861,8 +861,22 @@ export default function LiquidEther({
         });
       }
       calcSize() {
-        const width = Math.max(1, Math.round(this.options.resolution * Common.width));
-        const height = Math.max(1, Math.round(this.options.resolution * Common.height));
+        const isMobile = Common.width < 1024;
+        const maxSimDim = isMobile ? 220 : 360;
+        let width = Math.max(1, Math.round(this.options.resolution * Common.width));
+        let height = Math.max(1, Math.round(this.options.resolution * Common.height));
+
+        if (width > maxSimDim || height > maxSimDim) {
+          const ratio = width / height;
+          if (ratio >= 1) {
+            width = maxSimDim;
+            height = Math.max(1, Math.round(maxSimDim / ratio));
+          } else {
+            height = maxSimDim;
+            width = Math.max(1, Math.round(maxSimDim * ratio));
+          }
+        }
+
         const px_x = 1.0 / width;
         const px_y = 1.0 / height;
         this.cellScale.set(px_x, px_y);
@@ -975,6 +989,18 @@ export default function LiquidEther({
         this._loop = this.loop.bind(this);
         this._resize = this.resize.bind(this);
         window.addEventListener('resize', this._resize);
+
+        let scrollTimeout = null;
+        this._isScrolling = false;
+        this._onScroll = () => {
+          this._isScrolling = true;
+          clearTimeout(scrollTimeout);
+          scrollTimeout = setTimeout(() => {
+            this._isScrolling = false;
+          }, 100);
+        };
+        window.addEventListener('scroll', this._onScroll, { passive: true });
+
         this._onVisibility = () => {
           const hidden = document.hidden;
           if (hidden) {
@@ -1002,18 +1028,19 @@ export default function LiquidEther({
       }
       loop() {
         if (!this.running) return; // safety
-        // ── Mobile 30fps throttle ─────────────────────────────────────────────
-        // On mobile (pixelRatio capped at 1), target ~30fps to halve GPU work.
-        // Desktop always runs at native 60fps.
-        const isMobileThrottle = Common.pixelRatio <= 1 && Common.width < 1024;
-        if (isMobileThrottle) {
+        // ── Smart GPU Throttle ─────────────────────────────────────────────
+        // Pada mobile atau saat user sedang aktif scroll, batasi ke ~30-40fps
+        // agar GPU dan main thread 100% fokus menjalankan animasi scroll & UI dengan lancar.
+        const isMobile = Common.width < 1024;
+        const shouldThrottle = isMobile || this._isScrolling;
+        if (shouldThrottle) {
           const now = performance.now();
           const elapsed = now - (this._lastFrameTime || 0);
-          if (elapsed < 32) { // ~30fps = 33.3ms per frame
+          if (elapsed < 30) { // ~33fps
             rafRef.current = requestAnimationFrame(this._loop);
             return;
           }
-          this._lastFrameTime = now - (elapsed % 32);
+          this._lastFrameTime = now - (elapsed % 30);
         }
         // ─────────────────────────────────────────────────────────────────────
         this.render();
@@ -1034,6 +1061,7 @@ export default function LiquidEther({
       dispose() {
         try {
           window.removeEventListener('resize', this._resize);
+          window.removeEventListener('scroll', this._onScroll);
           document.removeEventListener('visibilitychange', this._onVisibility);
           Mouse.dispose();
           if (Common.renderer) {
